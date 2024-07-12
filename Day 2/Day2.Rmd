@@ -1,0 +1,110 @@
+---
+title: "Day 2 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+```{r}
+#input<-c(1,9,10,3,2,3,11,0,99,30,40,50)
+input<-read_lines("../../AoCData/AOC2019/Day2.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
+
+```
+
+I have to admit - I've slightly read ahead here so I know where this is heading (loosely).  To start, create the opcodes. For the time being, I'm leaving this as a 
+
+
+```{r}
+### remember, offset 1
+op01<-function(a,b){
+  output<-a+b
+output}
+
+### opcode 2 multiplies
+op02<-function(a,b,prg){
+  output<-a*b
+output}
+```
+
+```{r}
+iccomp<-function(prg){
+  i<-1
+  while(prg[i]!=99){
+    switch(as.character(prg[i]),
+           "1"={
+             a<-prg[i+1]
+             b<-prg[i+2]
+             c<-prg[i+3]
+             prg[c+1]<-prg[a+1]+prg[b+1]
+             i<-i+4},
+           "2"={
+             a<-prg[i+1]
+             b<-prg[i+2]
+             c<-prg[i+3]
+             prg[c+1]<-prg[a+1]*prg[b+1]
+             i<-i+4},
+           cat("unknown opcode"))
+    }
+  return(prg)}
+```
+
+```{r}
+iccomp(c(1,1,1,4,99,5,6,0,99))
+```
+
+```{r}
+p1<-intcode
+### replace position 1 with 12
+p1[2]<-12
+### replace position 2 with 2
+p1[3]<-2
+part1<-iccomp(p1)
+part1
+part1[1]
+
+```
+## Part 2
+Trying to find the noun-verb combination that adds up to the output:
+
+
+```{r}
+findnounverb<-function(prg,target){
+  ### first find noun
+  noun<-sapply(0:99,function(x){
+    a<-intcode
+    a[2]<-x
+    a[3]<-0
+    a<-iccomp(a)[1]
+    a})
+  noun<-max(which(noun<target))-1
+  cat("noun: ",noun)
+  ### then the verb
+  verb<-sapply(0:99,function(x){
+    a<-intcode
+    a[2]<-noun
+    a[3]<-x
+    a<-iccomp(a)[1]
+    a})
+  verb<-max(which(verb==target))-1
+  cat(" verb: ",verb)
+100*noun+verb}
+```
+
+
+
+```{r}
+findnounverb(intcode,19690720)
+```
+
+
+

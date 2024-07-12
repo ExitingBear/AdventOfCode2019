@@ -1,0 +1,350 @@
+---
+title: "Day 11 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(gganimate)
+library(gifski)
+library(ggplot2)
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+## The Intcode
+
+```{r}
+iccomp<-function(prg,inp,starthere,relativebase,quiet){
+  #cat("-----------\n")
+ # cat("-----------\n")
+  i<-starthere
+  outp<-c()
+  while(prg[i]!=99){
+    ## make sure that at least the next three numbers exist
+    if((i+3)>length(prg)){
+      prg<-c(prg,
+             rep(0,(i+3-length(prg))))}
+    opcode<-as.character(prg[i]%%100)
+    firstp<-(prg[i]%/%100)%%10
+    secondp<-(prg[i]%/%1000)%%10
+    thirdp<-prg[i]%/%10000
+    if(quiet==F){cat("i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")}
+    switch(opcode,
+           ### add
+           "1"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a+b
+             i<-i+4},
+           ### multiply
+           "2"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a*b
+             i<-i+4},
+           ### input
+           "3"={
+             if(firstp==0){a<-prg[i+1]}
+             if(firstp==2){a<-prg[i+1]+relativebase}
+             if(is.na(a)){a<-0}
+             if(length(inp)==0){
+               if(quiet==F){cat("waiting---\n")}
+               return(list(prg,outp,i,relativebase))
+             }else{
+               if(quiet==F){cat("input: ",inp[1]," - ")}
+               prg[a+1]<-inp[1]
+               if(quiet==F){cat("put it here: ",a+1,"\n")}
+               inp<-inp[-1]
+               i<-i+2}},
+           ### output
+           "4"={
+             a<-prg[i+1]
+            # cat("****\n",a,"******\n")
+             if(firstp==0){
+               if(quiet==F){cat("looking here: ",a+1,"\n")}
+               a<-prg[a+1]}
+             if(firstp==2){
+               if(quiet==F){cat("looking here: ",a+1+relativebase,"\n")}
+               a<-prg[a+1+relativebase]}
+            # cat("****\n",a,"******\n")
+             if(is.na(a)){a<-0}
+             if(quiet==F){cat("output: ",a,"\n")}
+             outp<-c(outp,a)
+             i<-i+2},
+           ### jump if true
+           "5"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a!=0){i<-b+1}else{i<-i+3}},
+           ### jump if false
+           "6"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a==0){i<-b+1}else{i<-i+3}},
+           ### less than
+           "7"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a<b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "8"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a==b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "9"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             relativebase<-relativebase+a
+             i<-i+2},
+           {cat(i,": unknown opcode",opcode,"\n")
+             break})
+    prg<-replace(prg,is.na(prg),0)}
+  #  cat("ENDING i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")
+  
+  return(list(prg,outp,0,relativebase))}
+```
+
+
+
+```{r}
+#input<-read_lines("Day11Sample.txt")
+input<-read_lines("../../AoCData/AOC2019/Day11.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
+```
+
+## Part 1
+I think I get the output from my machine and use that to figure out the robot
+
+```{r}
+painthull<-function(intcode,startspace){
+  keepgoing<-TRUE
+  hull<-dict()
+  currspace<-c(0,0)
+  ### set the starting color
+  cs<-str_flatten(currspace,collapse = " ")
+  hull$set(cs,startspace)
+  nextinst<-1
+  currdir<-"U"
+  inputcount<-1
+  rb<-0
+  while(keepgoing&&inputcount<100000){
+    cs<-str_flatten(currspace,collapse = " ")
+    ### if this is a new space, it's 0.  if it's an old space, get the actual colo
+    nextinput<-hull$get(cs,default=0)
+    runcode<-iccomp(intcode,nextinput,nextinst,rb,T)
+    ### paint
+    hull$set(cs,runcode[[2]][1])
+    ### if at the end, break the cycle
+    if(runcode[[3]]==0){
+      keepgoing<-FALSE
+      break}else{nextinst<-runcode[[3]]}
+    ### otherwise
+    ### update the program
+    intcode<-runcode[[1]]
+    ### update the starting input
+    nextinput<-runcode[[2]][1]
+    ### update the relative base
+    rb<-runcode[[4]]
+    ### update the direction
+    switch(currdir,
+           "U"={if(runcode[[2]][2]==0){currdir<-"L"}else{currdir<-"R"}},
+           "L"={if(runcode[[2]][2]==0){currdir<-"D"}else{currdir<-"U"}},
+           "D"={if(runcode[[2]][2]==0){currdir<-"R"}else{currdir<-"L"}},
+           "R"={if(runcode[[2]][2]==0){currdir<-"U"}else{currdir<-"D"}},
+           {cat("bad direction\n")
+             currdir<-"BD"})
+    ### move forward 1
+    switch(currdir,
+           "U"=currspace<-currspace+c(0,1),
+           "L"=currspace<-currspace+c(-1,0),
+           "D"=currspace<-currspace+c(0,-1),
+           "R"=currspace<-currspace+c(1,0),
+           {cat("bad direction, can't move\n")})
+    inputcount<-inputcount+1
+    if(inputcount%%1000==0){cat("runcount ",inputcount," size ",hull$size(),"\n")}}
+hull}
+```
+
+
+
+
+```{r}
+p1<-painthull(intcode,0)
+part1<-p1$size()
+part1
+```
+### Part 2
+
+```{r}
+p2<-painthull(intcode,1)
+
+p2frame<-as.data.frame(t(rbind(unlist(p2$keys()),unlist(p2$values()))))
+p2frame<-p2frame%>%rowwise%>%
+  mutate(x=str_split_i(V1," ",1),y=str_split_i(V1," ",2))%>%
+  mutate(x=as.numeric(x),y=as.numeric(y),colorval=V2)%>%
+  select(x,y,colorval)
+```
+
+
+
+
+```{r,echo=FALSE}
+hullcolors<-c("1"="#FFFFFF","0"="#000000")
+hull<-ggplot()+
+  geom_tile(data=p2frame,aes(x=x,y=y,fill=colorval))+
+  scale_fill_manual(values=hullcolors)+
+  theme(panel.background=element_rect(fill="#000000"),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  coord_fixed()
+```
+```{r,eval=FALSE,echo=FALSE}
+
+#### For the animation
+painthullanim<-function(intcode,startspace){
+  keepgoing<-TRUE
+  hull<-dict()
+  currspace<-c(0,0)
+  ### set the starting color
+  cs<-str_flatten(currspace,collapse = " ")
+  hull$set(cs,startspace)
+  nextinst<-1
+  currdir<-"U"
+  inputcount<-1
+  rb<-0
+  animframe<-as.data.frame(matrix(ncol=4,nrow=0))
+  while(keepgoing&&inputcount<100000){
+    cs<-str_flatten(currspace,collapse = " ")
+    ### if this is a new space, it's 0.  if it's an old space, get the actual colo
+    nextinput<-hull$get(cs,default=0)
+    runcode<-iccomp(intcode,nextinput,nextinst,rb,T)
+    ### paint
+    hull$set(cs,runcode[[2]][1])
+    
+    animframe<-rbind(animframe,c(currspace,runcode[[2]][1],inputcount))
+    
+    ### if at the end, break the cycle
+    if(runcode[[3]]==0){
+      keepgoing<-FALSE
+      break}else{nextinst<-runcode[[3]]}
+    ### otherwise
+    
+    
+    ### update the program
+    intcode<-runcode[[1]]
+    ### update the starting input
+    nextinput<-runcode[[2]][1]
+    ### update the relative base
+    rb<-runcode[[4]]
+    ### update the direction
+    switch(currdir,
+           "U"={if(runcode[[2]][2]==0){currdir<-"L"}else{currdir<-"R"}},
+           "L"={if(runcode[[2]][2]==0){currdir<-"D"}else{currdir<-"U"}},
+           "D"={if(runcode[[2]][2]==0){currdir<-"R"}else{currdir<-"L"}},
+           "R"={if(runcode[[2]][2]==0){currdir<-"U"}else{currdir<-"D"}},
+           {cat("bad direction\n")
+             currdir<-"BD"})
+    ### move forward 1
+    switch(currdir,
+           "U"=currspace<-currspace+c(0,1),
+           "L"=currspace<-currspace+c(-1,0),
+           "D"=currspace<-currspace+c(0,-1),
+           "R"=currspace<-currspace+c(1,0),
+           {cat("bad direction, can't move\n")})
+    inputcount<-inputcount+1
+    if(inputcount%%1000==0){cat("runcount ",inputcount," size ",hull$size(),"\n")}}
+animframe}
+
+
+
+day11animframe<-painthullanim(intcode,1)
+colnames(day11animframe)<-c("x","y","colorval","paint")
+day11animframe$colorval<-as.character(day11animframe$colorval)
+
+
+
+hullcolors<-c("1"="#FFFFFF","0"="#000000")
+hullbase<-ggplot()+
+  scale_fill_manual(values=hullcolors)+
+  theme(panel.background=element_rect(fill="#000000"),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  coord_fixed()+
+  geom_tile(data=day11animframe,aes(x=x,y=y,fill=colorval))+
+  transition_states(paint,wrap=FALSE)+
+  shadow_mark()
+
+
+hullanim<-animate(hullbase,nframes=249,renderer = gifski_renderer(),end_pause=15)
+
+anim_save("Part2Day11.gif",hullanim)
+```
+
+![Painting](Part2Day11.gif)

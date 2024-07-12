@@ -1,0 +1,185 @@
+---
+title: "Day 14 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(igraph)
+library(ggplot2)
+library(ggraph)
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+```{r}
+#input<-read_lines("Day14Sample5.txt")
+input<-read_lines("../../AoCData/AOC2019/Day14.txt")
+```
+
+## Part 1
+This is recursive.
+
+I think I'm going to do an unholy combination of a about 6 different things... I am building a map so that I can roll up by "distance to ore" & a transform list.  Also, I hate this solution - it's way too scattered
+```{r}
+
+rmatrix<-matrix(ncol=4,nrow=0)
+for(i in 1:length(input)){
+  reaction<-unlist(str_split(input[i], ", | => "))
+  ### deal with the result
+  result<-tail(reaction,1)
+  result<-unlist(str_split(result," "))
+  result[[1]]<-as.numeric(result[[1]])
+  components<-reaction[-length(reaction)]
+  ### make the map
+  for(j in 1:length(components)){
+    cmp<-components[j]
+    cmp<-unlist(str_split(cmp," "))
+    cmp[[1]]<-as.numeric(cmp[[1]])
+    rmatrix<-rbind(rmatrix,c(result[[1]],result[[2]],cmp[[1]],cmp[[2]]))}}
+reactmap<-graph_from_edgelist(rmatrix[,c(4,2)])
+rmatrix<-as.data.frame(rmatrix)
+colnames(rmatrix)<-c("wcount","wanted","ncount","needed")
+rmatrix$wcount<-as.numeric(rmatrix$wcount)
+rmatrix$ncount<-as.numeric(rmatrix$ncount)
+
+```
+
+
+
+```{r}
+ggraph(reactmap,layout="dendrogram")+
+  geom_edge_diagonal(aes(start_cap = label_rect(node1.name),
+                     end_cap = label_rect(node2.name)), 
+                 arrow = arrow(length = unit(2, 'mm')))+
+  geom_node_text(aes(label=name))
+```
+
+
+
+
+
+```{r}
+ranktable<-as.data.frame(matrix(ncol=2,nrow=0))
+for(i in 1:length(V(reactmap))){
+  addv<-V(reactmap)[i]$name
+  if(addv=="ORE"){fdist<-1
+  }else{
+    fdist<-max(sapply(all_simple_paths(reactmap,from="ORE",to=addv),
+                    function(x){length(names(x))}))}
+  ranktable<-rbind(ranktable,list(addv,fdist))
+}
+
+colnames(ranktable)<-c("component","rnk")
+arrange(ranktable,desc(rnk))
+```
+
+
+
+Takes in an element and the number wanted and breaks it into the number of components needed to get there
+```{r}
+breakdown<-function(x,rmat){
+  getcomponent<-x$component
+  getnumber<-x$cnt
+  rmat<-rmat%>%rowwise%>%filter(wanted==getcomponent)
+  mplier<-ceiling(getnumber/rmat$wcount[1])
+  rmat<-rmat%>%rowwise%>%mutate(ncount=ncount*mplier)%>%
+    mutate(component=needed,cnt=ncount)%>%
+    select(component,cnt)
+  rmat}
+```
+
+
+
+```{r}
+howmuchore<-function(rmat,rtab){
+  ### create the starting single fuel
+  ### (see maybe up above)
+  inglist<-as.data.frame((matrix(c(component="FUEL",cnt=1),ncol=2,byrow=T)))
+  colnames(inglist)<-c("component","cnt")
+  inglist$cnt<-as.numeric(inglist$cnt)
+  r<-1
+  while(any(inglist$component != "ORE")){
+    ### find them in the rank table
+    inglist<-inglist%>%rowwise%>%
+      left_join(rtab,by=join_by(component))%>%
+      ### sort the ingredient list by rank (descending)
+      arrange(desc(rnk))%>%
+      ### remove the rank
+      select(-rnk)
+    ### grab the top one
+    breakme<-breakdown(inglist[1,],rmat)
+    ### remove it & break it down into its components
+    ### add the new components back in.
+    inglist<-rbind(inglist[-1,],breakme)
+    ### summarize to keep a list of everything newly needed
+    inglist<-inglist%>%group_by(component)%>%summarize(cnt=sum(cnt))
+    r<-r+1}
+  #### ingredients should be just "ORE"  
+  inglist}
+```
+
+```{r}
+howmuchore(rmatrix,ranktable)
+```
+## Part 2
+
+
+```{r}
+howmuchore_fuel<-function(rmat,rtab,f){
+  ### create the starting single fuel
+  ### (see maybe up above)
+  inglist<-as.data.frame((matrix(c(component="FUEL",cnt=f),ncol=2,byrow=T)))
+  colnames(inglist)<-c("component","cnt")
+  inglist$cnt<-as.numeric(inglist$cnt)
+  r<-1
+  while(any(inglist$component != "ORE")){
+    ### find them in the rank table
+    inglist<-inglist%>%rowwise%>%
+      left_join(rtab,by=join_by(component))%>%
+      ### sort the ingredient list by rank (descending)
+      arrange(desc(rnk))%>%
+      ### remove the rank
+      select(-rnk)
+    ### grab the top one
+    breakme<-breakdown(inglist[1,],rmat)
+    ### remove it & break it down into its components
+    ### add the new components back in.
+    inglist<-rbind(inglist[-1,],breakme)
+    ### summarize to keep a list of everything newly needed
+    inglist<-inglist%>%group_by(component)%>%summarize(cnt=sum(cnt))
+    r<-r+1}
+  #### ingredients should be just "ORE"  
+  inglist$cnt}
+```
+
+
+Binary Search it - 
+is it the elegant way to get this done? no.  But will if *find* the right answer - yes.
+
+
+```{r}
+findatrillion<-function(rmat,rtab){
+ possibly<-howmuchore_fuel(rmat,rtab,1)
+ cat(possibly,"\n")
+ ### set min to be a million over the base, set max to be 10 times that much
+ minf<-1000000000000%/%possibly
+ maxf<-10*minf
+ while(maxf-minf!=1){
+   if(maxf-minf==2){attempt<-maxf-1
+   }else{attempt<-(maxf+minf)%/%2}
+   cat(minf,attempt,maxf,"\n")
+   tryit<-howmuchore_fuel(rmat,rtab,attempt)
+   if(tryit<=1000000000000){
+     minf<-attempt
+   }else{maxf<-attempt}}
+minf}
+```
+
+```{r}
+findatrillion(rmatrix,ranktable)
+```

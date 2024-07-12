@@ -1,0 +1,229 @@
+---
+title: "Day 7 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+```{r}
+input<-read_lines("../../AoCData/AOC2019/Day7.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
+```
+
+
+## Part 1
+Start with the iccomp - slight change to return either prg or output
+Also, changing input to work its way down the list of inputs
+
+```{r}
+iccomp<-function(prg,inp,starthere){
+  i<-starthere
+  #outp<-c()
+  ## for day 7
+  outp<-0
+  while(prg[i]!=99){
+  #  cat(i,"-",prg[i],":",prg,"\n\n")
+    ### deal with immediate mode (or not)
+    ### 
+    opcode<-as.character(prg[i]%%100)
+    firstp<-(prg[i]%/%100)%%10
+    secondp<-(prg[i]%/%1000)%%10
+    thirdp<-prg[i]%%10000
+ #   cat("i: ",i," opcode: ",opcode,"\n")
+    switch(opcode,
+           ### add
+           "1"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             c<-prg[i+3]
+             prg[c+1]<-a+b
+             i<-i+4},
+           ### multiply
+           "2"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             c<-prg[i+3]
+              prg[c+1]<-a*b
+             i<-i+4},
+           ### input
+           "3"={
+             a<-prg[i+1]
+             if(length(inp)==0){
+               cat("waiting---\n")
+               return(list(prg,outp,i))
+             }else{
+               cat("input: ",inp[1]," - ")
+             prg[a+1]<-inp[1]
+             inp<-inp[-1]
+             i<-i+2}},
+           ### output
+           "4"={
+             a<-prg[i+1]
+             if(firstp==0){
+               a<-prg[a+1]}
+             cat("output: ",a," - ")
+             ## day 7 only
+             if(a>outp){
+               outp<-a}else
+               {break}
+             ## end day 7
+             i<-i+2},
+           ### jump if true
+           "5"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(a!=0){i<-b+1}else{i<-i+3}},
+           ### jump if false
+           "6"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(a==0){i<-b+1}else{i<-i+3}},
+           ### less than
+           "7"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             c<-prg[i+3]
+             if(a<b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "8"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             c<-prg[i+3]
+             if(a==b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},{
+               cat(i,": unknown opcode",opcode,"\n")
+               break})}
+  return(list(prg,outp,0))}
+```
+
+
+
+```{r}
+thrustersignal<-function(prg,pss,secondinput){
+  pss<-as.numeric(unlist(str_split(pss,"")))
+  ### in case the starting sequence is less than 10000
+  pss<-c(rep(0,5-length(pss)),pss)
+  cat(pss,"\n")
+  i<-1
+  while(i<=length(pss)){
+    phasesetting<-pss[i]
+    amplify<-iccomp(prg,c(phasesetting,secondinput),1)
+    prg<-amplify[[1]]
+    secondinput<-amplify[[2]]
+   # cat(secondinput,"\n")
+    i<-i+1}
+secondinput}
+```
+
+```{r}
+thrustersignal(c(3,23,3,24,1002,24,10,24,1002,23,-1,23,
+101,5,23,23,1,24,23,23,4,23,99,0,0),01234,0)
+```
+
+```{r}
+maxts<-function(prg,psvector,secondinput){  
+  allperms<-permn(psvector)
+  allperms<-sapply(allperms,str_flatten)
+  mts<-0
+  for(i in 1:length(allperms)){
+    ts<-thrustersignal(prg,allperms[i],0)
+    if(ts>mts){
+      mts<-ts
+      longest<-allperms[i]}
+    cat("****\n")}
+  cat(longest,"\n")
+  mts}
+  
+```
+
+```{r}
+maxts(intcode,c(0,1,2,3,4),0)
+```
+
+## Part 2
+
+
+
+
+```{r}
+feedbacksignal<-function(prg,pss,inp){
+  pss<-as.numeric(unlist(str_split(pss,"")))
+  ### in case the starting sequence is less than 10000
+  pss<-c(rep(0,5-length(pss)),pss)
+  cat(pss,"\n")
+  strtinst<-rep(1,5)
+  mchnprg<-list(prg,prg,prg,prg,prg)
+  mchn<-1
+  runthrough<-1
+  keepgoing<-1
+  while(keepgoing){
+    while(mchn<=length(pss)){
+      if(strtinst[mchn]!=0){
+      if(runthrough==1){
+        amplify<-iccomp(mchnprg[[mchn]],c(pss[mchn],inp),strtinst[mchn])
+      }else{amplify<-iccomp(mchnprg[[mchn]],c(inp),strtinst[mchn])}
+      mchnprg[[mchn]]<-amplify[[1]]
+      inp<-amplify[[2]]
+      strtinst[mchn]<-amplify[[3]]
+      mchn<-mchn+1}else{
+        cat(mchn,"done\n")
+      mchn<-mchn+1}
+      }
+    if(all(strtinst==0)){keepgoing=FALSE
+    break}
+    cat(runthrough," ******\n")
+    runthrough<-runthrough+1
+    mchn<-1
+    }
+  inp}
+  
+```
+
+
+```{r}
+part2<-feedbacksignal(intcode,97856,0)
+```
+
+```{r}
+maxfs<-function(prg,psvector,secondinput){  
+  allperms<-permn(psvector)
+  allperms<-sapply(allperms,str_flatten)
+  mfs<-0
+  for(i in 1:length(allperms)){
+    cat(allperms[i],"\n")
+    fs<-feedbacksignal(prg,allperms[i],0)
+    if(fs>mfs){
+      mfs<-fs
+      longest<-allperms[i]}
+    cat("\n",i,"  ************************\n")}
+  cat(longest,"\n")
+  mfs}
+  
+```
+
+```{r}
+maxfs(intcode,
+      c(5,6,7,8,9),
+      0)
+```

@@ -1,0 +1,398 @@
+---
+title: "Day 15 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(gganimate)
+library(gifski)
+library(ggplot2)
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+## The Intcode
+
+```{r}
+iccomp<-function(prg,inp,starthere,relativebase,quiet){
+#cat("-----------\n")
+#cat("-----------\n")
+  i<-starthere
+  outp<-c()
+  while(prg[i]!=99){
+    ## make sure that at least the next three numbers exist
+    if((i+3)>length(prg)){
+      prg<-c(prg,
+             rep(0,(i+3-length(prg))))}
+    opcode<-as.character(prg[i]%%100)
+    firstp<-(prg[i]%/%100)%%10
+    secondp<-(prg[i]%/%1000)%%10
+    thirdp<-prg[i]%/%10000
+ #   if(quiet==F){cat("i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")}
+    switch(opcode,
+           ### add
+           "1"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a+b
+             i<-i+4},
+           ### multiply
+           "2"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a*b
+             i<-i+4},
+           ### input
+           "3"={
+             if(firstp==0){a<-prg[i+1]}
+             if(firstp==2){a<-prg[i+1]+relativebase}
+             if(is.na(a)){a<-0}
+             if(length(inp)==0){
+               if(quiet==F){cat("waiting---\n")}
+               return(list(prg,outp,i,relativebase))
+             }else{
+               if(quiet==F){cat("input: ",inp[1]," - ")}
+               prg[a+1]<-inp[1]
+           #    if(quiet==F){cat("put it here: ",a+1,"\n")}
+               inp<-inp[-1]
+               i<-i+2}},
+           ### output
+           "4"={
+             a<-prg[i+1]
+            # cat("****\n",a,"******\n")
+             if(firstp==0){
+           #    if(quiet==F){cat("looking here: ",a+1,"\n")}
+               a<-prg[a+1]}
+             if(firstp==2){
+            #   if(quiet==F){cat("looking here: ",a+1+relativebase,"\n")}
+               a<-prg[a+1+relativebase]}
+            # cat("****\n",a,"******\n")
+             if(is.na(a)){a<-0}
+             if(quiet==F){cat("output: ",a,"\n")}
+             outp<-c(outp,a)
+             i<-i+2},
+           ### jump if true
+           "5"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a!=0){i<-b+1}else{i<-i+3}},
+           ### jump if false
+           "6"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a==0){i<-b+1}else{i<-i+3}},
+           ### less than
+           "7"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a<b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "8"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a==b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "9"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             relativebase<-relativebase+a
+             i<-i+2},
+           {cat(i,": unknown opcode",opcode,"\n")
+             break})
+    prg<-replace(prg,is.na(prg),0)}
+  #  cat("ENDING i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")
+  return(list(prg,outp,0,relativebase))}
+```
+
+
+```{r}
+input<-read_lines("../../AoCData/AOC2019/Day15.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
+
+```
+
+```{r}
+iccomp(intcode,1,1,0,F)[[2]]
+iccomp(intcode,2,1,0,F)[[2]]
+iccomp(intcode,3,1,0,F)[[2]]
+iccomp(intcode,4,1,0,F)[[2]]
+
+```
+## Part 1
+
+Going to search this - and it's going to be weird.
+The way this works is to test all of the walls as I search so instead of going down & back up a path, just keep going forward  - 
+
+Basic idea is:
+1. Get a position from the queue (and the program, starting instruction, and relative base), for each direction:
+a. check to see if I already know what is there - if so, no need to bother
+b. find out what's there - and store it in my known information for future checks
+c. if it is the wall or the oxygen, stop
+d. if it's an empty space - put that space (along with the current program, starting instruction, and relative base) in the queue for future exploration.
+
+2. Mark where the oxygen tank is, but keep going to map out everything, just in case
+
+```{r}
+findOS<-function(prg){
+  beenthere<-dict()
+  pq<-priority_queue()
+  ### putting in x,y,steps,program,startinst,relativebase
+  strt<-list(0,0,0,prg,1,0)
+  pq$push(strt,0)
+  beenthere$set(str_flatten(c(0,0)," "),c(1,0))
+  foundit<-list()
+  founditsteps<-c()
+  roundcount<-1
+  while(pq$size()>0){
+    curr<-pq$pop()
+    currx<-curr[[1]]
+    curry<-curr[[2]]
+    currstp<-curr[[3]]
+    currprg<-curr[[4]]
+    currsi<-curr[[5]]
+    currrb<-curr[[6]]
+    ### stop and go to the next if at the end
+    if(currsi==0){cat("end of the program",currx,curry,"\n")
+      next}
+    ### for each direction
+    ### North
+    if(!beenthere$has(str_flatten(c(currx,curry+1)," "))){
+      #### find out what's in front of this
+      n<-iccomp(currprg,1,currsi,currrb,T)
+      #### update been there
+      beenthere$set(str_flatten(c(currx,curry+1)," "),c(n[[2]],currstp+1))
+      #### if have found the system, add it
+      if(n[[2]]==2){
+        cat("Foundit! ",currx,curry+1,currstp+1,"\n")
+        foundit<-c(foundit,list(c(currx,curry+1)))
+        founditsteps<-c(founditsteps,currstp+1)}
+      #### otherwise keep going 
+      if(n[[2]]==1){
+        pq$push(list(currx,curry+1,currstp+1,n[[1]],n[[3]],n[[4]]),currstp+1)}}
+    ### South
+    if(!beenthere$has(str_flatten(c(currx,curry-1)," "))){
+      #### find out what's in front of this
+      s<-iccomp(currprg,2,currsi,currrb,T)
+      #### update been there
+      beenthere$set(str_flatten(c(currx,curry-1)," "),c(s[[2]],currstp+1))
+      #### if have found the system, add it
+      if(s[[2]]==2){
+        cat("Foundit! ",currx,curry-1,currstp+1,"\n")
+        foundit<-c(foundit,list(c(currx,curry-1)))
+        founditsteps<-c(founditsteps,currstp+1)}
+      #### otherwise keep going 
+      if(s[[2]]==1){
+        pq$push(list(currx,curry-1,currstp+1,s[[1]],s[[3]],s[[4]]),currstp+1)}}
+    ### West
+    if(!beenthere$has(str_flatten(c(currx-1,curry)," "))){
+      #### find out what's in front of this
+      w<-iccomp(currprg,3,currsi,currrb,T)
+      #### update been there
+      beenthere$set(str_flatten(c(currx-1,curry)," "),c(w[[2]],currstp+1))
+      #### if have found the system, add it
+      if(w[[2]]==2){
+        cat("Foundit! ",currx-1,curry,currstp+1,"\n")
+        foundit<-c(foundit,list(c(currx-1,curry)))
+        founditsteps<-c(founditsteps,currstp+1)}
+      #### otherwise keep going
+      if(w[[2]]==1){
+        pq$push(list(currx-1,curry,currstp+1,w[[1]],w[[3]],w[[4]]),currstp+1)}}
+    ### East
+    if(!beenthere$has(str_flatten(c(currx+1,curry)," "))){
+      #### find out what's in front of this
+      e<-iccomp(currprg,4,currsi,currrb,T)
+      #### update been there
+      beenthere$set(str_flatten(c(currx+1,curry)," "),c(e[[2]],currstp+1))
+      #### if have found the system, add it
+      if(e[[2]]==2){
+        cat("Foundit! ",currx+1,curry,currstp+1,"\n")
+        foundit<-c(foundit,list(c(currx+1,curry)))
+        founditsteps<-c(founditsteps,currstp+1)}
+      #### otherwise keep going 
+      if(e[[2]]==1){
+        pq$push(list(currx+1,curry,currstp+1,e[[1]],e[[3]],e[[4]]),currstp+1)}}
+    roundcount<-roundcount+1
+    if(roundcount%%100==0){cat(roundcount,pq$size(),"\n")}
+  }
+  ### find out where the final step was
+  cat(roundcount,"----",paste(foundit),"\n")
+  ### list the number of steps, return the "been there"
+  list(founditsteps,beenthere)}
+```
+
+
+
+```{r}
+p1<-findOS(intcode)
+part1<-p1[[1]]
+part1
+```
+## Part 2
+
+Start by looking at the full map of the area - mapping out everything just in case worked wonders
+
+```{r}
+mapme<-p1[[2]]
+oxygraph<-as.data.frame(matrix(ncol=4,nrow=0))
+coords<-mapme$keys()
+fills<-mapme$values()
+for(i in 1:length(coords)){
+  co<-as.numeric(unlist(str_split(coords[i]," ")))
+  co<-list(co[1],co[2],as.character(fills[[i]][1]),fills[[i]][2])
+  oxygraph<-rbind(oxygraph,co)}
+colnames(oxygraph)<-c("x","y","oxys","minutes")
+```
+
+
+```{r,echo=FALSE}
+tlvls<-c("0"="#000088","1"="#FFFFFF","2"="#FF00FF")
+ogrstatic<-ggplot()+
+  geom_tile(data=oxygraph,aes(x=x,y=y,fill=oxys))+
+  geom_point(aes(x=0,y=0),color="#000000")+
+  scale_fill_manual(values=tlvls)+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  coord_fixed()
+
+ogr<-ogrstatic+
+  transition_states(minutes,wrap=FALSE)+
+  shadow_mark()+
+  view_follow()
+
+findoxanim<-animate(ogr,nframes=200,renderer = gifski_renderer(),end_pause=15)
+ogrstatic
+```
+Ignore the walls - there's no need to consider them.
+```{r}
+valspace<-oxygraph%>%rowwise%>%filter(oxys!=0)%>%select(x,y)
+```
+
+So then, map out the valid spaces, starting at the watercooler in (12,-12)
+
+```{r}
+oxyfill<-function(crdlist){
+  checklist<-dict()
+  for(i in 1:nrow(crdlist)){
+    checklist$set(str_flatten(c(crdlist$x[i],crdlist$y[i])," "),NA)}
+  beenthere<-dict()
+  pq<-priority_queue()
+  ### push x,y,number of steps
+  pq$push(c(12,-12,0),0)
+  maxsteps<-0
+  while(pq$size()>0&&beenthere$size()<checklist$size()){
+    curr<-pq$pop()
+    currx<-curr[1]
+    curry<-curr[2]
+    currs<-curr[3]
+    if(beenthere$has(str_flatten(c(currx,curry)," "))){next}
+    beenthere$set(str_flatten(c(currx,curry)," "),currs)
+    maxsteps<-max(maxsteps,currs)
+    ### in each direction, check if that's a valid space - if so, put it on the queue. If not - ignore
+
+    ### north
+    if(checklist$has(str_flatten(c(currx,curry+1)," "))){
+      pq$push(c(currx,curry+1,currs+1),-currs-1)}                           
+    ### south
+    if(checklist$has(str_flatten(c(currx,curry-1)," "))){
+      pq$push(c(currx,curry-1,currs+1),-currs-1)}                           
+    ### west
+    if(checklist$has(str_flatten(c(currx-1,curry)," "))){
+      pq$push(c(currx-1,curry,currs+1),-currs-1)}                           
+    ### east
+    if(checklist$has(str_flatten(c(currx+1,curry)," "))){
+      pq$push(c(currx+1,curry,currs+1),-currs-1)}}
+  cat("max steps: ",maxsteps,"\n")
+  beenthere}
+```
+
+```{r}
+p2<-oxyfill(valspace)
+```
+
+```{r,eval=FALSE,echo=FALSE}
+mapox2<-p1[[2]]
+oxyg2<-as.data.frame(matrix(ncol=3,nrow=0))
+coords2<-p2$keys()
+fills2<-p2$values()
+for(i in 1:length(coords2)){
+  co<-as.numeric(unlist(str_split(coords2[i]," ")))
+  co<-list(co[1],co[2],fills2[[i]])
+  oxyg2<-rbind(oxyg2,co)}
+colnames(oxyg2)<-c("x","y","mins")
+### solely for the animation
+oxyg2<-oxyg2%>%rowwise%>%mutate(minutes=mins+340)
+```
+
+
+```{r,eval=FALSE,echo=FALSE}
+ogr2<-ogr+
+  geom_point(data=oxyg2,aes(x=x,y=y,color=mins))
+
+findoxanim2<-animate(ogr2,nframes=400,renderer = gifski_renderer(),end_pause=15)
+findoxanim2
+```
+```{r,eval=FALSE,echo=FALSE}
+anim_save("Day15Part1.gif",findoxanim)
+anim_save("Day15Part2.gif",findoxanim2)
+
+```
+

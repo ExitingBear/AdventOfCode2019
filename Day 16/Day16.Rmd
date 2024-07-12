@@ -1,0 +1,82 @@
+---
+title: "Day 16 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+```{r}
+#input<-"12345678"
+input<-read_lines("../../AoCData/AOC2019/Day16.txt")
+inputsignal<-as.numeric(unlist(str_split(input,"")))
+```
+
+
+```{r}
+flawedFreak<-function(inpsig,phases){
+  basepattern<-c(0,1,0,-1)
+  p<-1
+  while(p<=phases){
+    outelement<-sapply(1:length(inpsig),function(x){
+      baserepeat<-(as.vector(sapply(basepattern,function(q){rep(q,x)})))
+      y<-baserepeat[-1]
+      while(length(y)<length(inpsig)){y<-c(y,baserepeat)}
+      y<-y[1:length(inpsig)]
+      y<-abs(sum(y*inpsig))%%10
+      })
+    cat(tail(outelement,25),"\n")
+    inpsig<-outelement
+    p<-p+1}
+inpsig}
+```
+
+
+```{r}
+p1<-flawedFreak(inputsignal,100)
+part1<-as.numeric(str_flatten(p1[1:8]))
+part1
+```
+## Part 2
+
+I have learned that starting at brute force is a waste of time.  So, I'm not going to try 6.5 million.
+
+```{r}
+fft2<-function(intsig,phases){
+  p<-1
+  lis<-length(intsig)
+  while(p<=phases){
+    outsig<-vector(length=lis)
+    os<-0
+    for(i in lis:1){
+      os<-(intsig[i]+os)%%10
+      outsig[i]<-os}
+    cat(p,"-",outsig[1:8],"\n")
+    intsig<-outsig
+    p<-p+1}
+
+  
+    intsig}
+
+
+```
+
+```{r}
+firstseven<-as.numeric(str_sub(input,1,7))
+longinput<-rep(as.numeric(unlist(str_split(input,""))),10000)[-(1:firstseven)]
+```
+
+
+```{r}
+p2<-fft2(longinput,100)
+part2<-as.numeric(str_flatten(p2[1:8]))
+part2
+```

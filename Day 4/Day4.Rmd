@@ -1,0 +1,95 @@
+---
+title: "Day 4 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+```{r}
+#input<-read_lines("Day4Sample.txt")
+input<-read_lines("../../AoCData/AOC2018/Day4.txt")
+
+```
+
+## Part 1
+
+This finds a valid pass
+
+```{r}
+validpass<-function(pass){
+  x<-diff(pass,1)
+  if(any(x<0)){return(FALSE)}
+  if(all(x!=0)){return(FALSE)}
+  TRUE}
+validpass(c(1,1,1,1,1,1))
+validpass(c(2,2,3,4,5,0))
+validpass(c(1,2,3,7,8,9))
+```
+
+This increments by 1 and marks every valid pass
+
+```{r}
+findvps<-function(low,high){
+  i<-low
+  validcount<-0
+  while(i<=high){
+    spliti<-as.numeric(unlist(str_split(i,"")))
+    if(validpass(spliti)){validcount<-validcount+1}
+    i<-i+1}
+validcount}
+```
+
+```{r}
+part1<-findvps(402328,864247)
+part1
+```
+
+## Part 2
+
+For part 2, make a change to validpass
+```{r}
+validpass2<-function(pass){
+  x<-diff(pass,1)
+  if(any(x<0)){return(FALSE)}
+  if(all(x!=0)){return(FALSE)}
+  y<-diff(which(x==0))
+  ### if there's only one pair, return true. 
+  if(length(y)==0){return(TRUE)}
+  ### if everything is the same, return FALSE
+  if(all(y==1)){return(FALSE)}
+  ### this is a hack - but a hack that I think works.
+  if(str_flatten(y)=="121"){return(FALSE)}
+  else{return(TRUE)}
+  }
+validpass2(c(1,1,2,2,3,3))
+validpass2(c(1,2,3,4,4,4))
+validpass2(c(1,1,1,1,2,2))
+validpass2(c(1,1,1,1,2,3))
+validpass2(c(1,1,1,2,2,2))
+```
+
+
+```{r}
+findvps2<-function(low,high){
+  i<-low
+  validcount<-0
+  while(i<=high){
+    spliti<-as.numeric(unlist(str_split(i,"")))
+    if(validpass2(spliti)){validcount<-validcount+1}
+    i<-i+1}
+validcount}
+```
+
+```{r}
+part2<-findvps2(402328,864247)
+part2
+```
