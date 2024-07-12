@@ -1,0 +1,129 @@
+---
+title: "Day 5 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+```{r}
+input<-read_lines("../../AoCData/AOC2019/Day5.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
+```
+
+
+```{r}
+iccomp<-function(prg,inp){
+  i<-1
+  outp<-c()
+  while(prg[i]!=99){
+    ### deal with immediate mode (or not)
+    ### 
+    opcode<-as.character(prg[i]%%100)
+    firstp<-(prg[i]%/%100)%%10
+    secondp<-(prg[i]%/%1000)%%10
+    thirdp<-prg[i]%%10000
+  #  cat("i: ",i," opcode: ",opcode,"\n")
+    switch(opcode,
+           ### add
+           "1"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             c<-prg[i+3]
+             prg[c+1]<-a+b
+             i<-i+4},
+           ### multiply
+           "2"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             c<-prg[i+3]
+             prg[c+1]<-a*b
+             i<-i+4},
+           ### input
+           "3"={
+             a<-prg[i+1]
+             prg[a+1]<-inp
+             i<-i+2},
+           ### output
+           "4"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             cat("output: ",a,"\n")
+             outp<-c(outp,a)
+             i<-i+2},
+           ### jump if true
+           "5"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(a!=0){i<-b+1}else{i<-i+3}},
+           ### jump if false
+           "6"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(a==0){i<-b+1}else{i<-i+3}},
+           ### less than
+           "7"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             c<-prg[i+3]
+             if(a<b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "8"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             c<-prg[i+3]
+             if(a==b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},{
+               cat(i,": unknown opcode",opcode,"\n")
+               break})}
+  #return(prg)
+  return(outp)}
+```
+
+
+
+
+```{r}
+part1<-iccomp(intcode,1)
+part1
+```
+
+## Part 2
+
+Add opcodes 5,6,7,8
+
+```{r}
+#iccomp(c(3,3,1108,-1,8,3,4,3,99),8)
+
+
+sapply(0:16,function(x){
+  iccomp(c(3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99),x)})
+```
+```{r}
+part2<-iccomp(intcode,5)
+part2
+
+```
+

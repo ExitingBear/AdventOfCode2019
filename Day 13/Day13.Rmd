@@ -1,0 +1,269 @@
+---
+title: "Day 13 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(ggraph)
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+## The Intcode
+
+```{r}
+iccomp<-function(prg,inp,starthere,relativebase,quiet){
+#cat("-----------\n")
+#cat("-----------\n")
+  i<-starthere
+  outp<-c()
+  while(prg[i]!=99){
+    ## make sure that at least the next three numbers exist
+    if((i+3)>length(prg)){
+      prg<-c(prg,
+             rep(0,(i+3-length(prg))))}
+    opcode<-as.character(prg[i]%%100)
+    firstp<-(prg[i]%/%100)%%10
+    secondp<-(prg[i]%/%1000)%%10
+    thirdp<-prg[i]%/%10000
+ #   if(quiet==F){cat("i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")}
+    switch(opcode,
+           ### add
+           "1"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a+b
+             i<-i+4},
+           ### multiply
+           "2"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a*b
+             i<-i+4},
+           ### input
+           "3"={
+             if(firstp==0){a<-prg[i+1]}
+             if(firstp==2){a<-prg[i+1]+relativebase}
+             if(is.na(a)){a<-0}
+             if(length(inp)==0){
+               if(quiet==F){cat("waiting---\n")}
+               return(list(prg,outp,i,relativebase))
+             }else{
+               if(quiet==F){cat("input: ",inp[1]," - ")}
+               prg[a+1]<-inp[1]
+           #    if(quiet==F){cat("put it here: ",a+1,"\n")}
+               inp<-inp[-1]
+               i<-i+2}},
+           ### output
+           "4"={
+             a<-prg[i+1]
+            # cat("****\n",a,"******\n")
+             if(firstp==0){
+           #    if(quiet==F){cat("looking here: ",a+1,"\n")}
+               a<-prg[a+1]}
+             if(firstp==2){
+            #   if(quiet==F){cat("looking here: ",a+1+relativebase,"\n")}
+               a<-prg[a+1+relativebase]}
+            # cat("****\n",a,"******\n")
+             if(is.na(a)){a<-0}
+             if(quiet==F){cat("output: ",a,"\n")}
+             outp<-c(outp,a)
+             i<-i+2},
+           ### jump if true
+           "5"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a!=0){i<-b+1}else{i<-i+3}},
+           ### jump if false
+           "6"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a==0){i<-b+1}else{i<-i+3}},
+           ### less than
+           "7"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a<b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "8"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a==b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "9"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             relativebase<-relativebase+a
+             i<-i+2},
+           {cat(i,": unknown opcode",opcode,"\n")
+             break})
+    prg<-replace(prg,is.na(prg),0)}
+  #  cat("ENDING i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")
+  return(list(prg,outp,0,relativebase))}
+```
+
+
+```{r}
+input<-read_lines("../../AoCData/AOC2019/Day13.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
+
+```
+
+## Part 1
+```{r}
+### run the input
+p1<-iccomp(intcode,c(),1,0,T)
+### get the arcade data
+arcade<-as.data.frame(matrix(p1[[2]],ncol=3,byrow=T))
+colnames(arcade)<-c("x","y","tid")
+```
+
+
+```{r}
+part1<-arcade%>%count(tid)
+part1
+```
+As tid 2 is a block tile - 
+
+
+
+
+```{r,echo=FALSE}
+arcade$tid<-as.character(arcade$tid)
+tilevalues<-c("0"="#EEEEEE","1"="#137892","2"="#234789","3"="#278349","4"="#FF2384")
+arcadegraph<-ggplot()+
+  geom_point(data=arcade,aes(x=x,y=y,color=tid,shape=tid))+
+  scale_color_manual(values=tilevalues)+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  scale_y_reverse()+
+  coord_fixed()
+arcadegraph
+```
+
+## Part 2
+
+
+For part 2, figure out where is the paddle, where is the ball, and then move the paddle left or right (or nowhere) depending on their relative positions
+
+
+```{r}
+playgame<-function(prg){
+  ## add quarters
+  prg[1]<-2
+  keepgoing<-TRUE
+  joystick<-c()
+  score<-c()
+  si<-1
+  rb<-0
+  ### because the computer overwrites old values, it's easier to just make this a dictionary (and overwrite) than to 
+  currentboard<-dict()
+  while(keepgoing &&  si!=0 ){
+    runit<-iccomp(prg,joystick,si,rb,T)
+    ### update the board - get updated output
+    updater<-runit[[2]]
+    for(i in seq(from=1,to=length(updater),by=3)){
+      ### update ball, paddle, and score
+      if(updater[i+2]==4){ball<-updater[i]}
+      if(updater[i+2]==3){paddle<-updater[i]}
+      if(updater[i]==-1&&updater[i+1]==0){score<-c(score,updater[i+2])}
+      currentboard$set(str_flatten(updater[(i):(i+1)]," "),updater[i+2])}
+    blockcount<-length(which(unlist(currentboard$values())==2))
+    ### if blockcount is 0, break 
+    if(blockcount==0){keepgoing<-FALSE
+    break}
+    ###move the joystick left, right, or straight
+    if(ball<paddle){joystick <- -1
+    }else if(ball>paddle){joystick <- 1
+    }else if(ball==paddle){joystick<-0
+    }else{(cat("I don't know what to do\n"))
+      break}
+    cat("Blocks: ",blockcount," paddle: ",paddle," ball: ",ball, " Joystick: ",joystick," score: ",tail(score,1),"\n")
+    ### update the prg,rb,and starting instruction
+    prg<-runit[[1]]
+    si<-runit[[3]]
+    rb<-runit[[4]]
+    }
+#### return all the scores
+score}
+```
+
+```{r}
+p2<-playgame(intcode)
+p2
+```
+
+```{r}
+quarters<-intcode
+quarters[1]<-2
+```
+
+```{r}
+xxx<-iccomp(quarters,-1,1,0,T)
+```
+
+```{r}
+try1<-as.data.frame(matrix(xxx[[2]],ncol=3,byrow=T))
+colnames(try1)<-c("x","y","tid")
+```
+

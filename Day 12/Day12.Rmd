@@ -1,0 +1,131 @@
+---
+title: "Day 12 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(numbers)
+library(ggplot2)
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+
+```{r}
+#input<-read_lines("Day12Sample2.txt")
+input<-read_lines("../../AoCData/AOC2019/Day12.txt")
+```
+
+
+
+```{r}
+moons<-as.data.frame(matrix(ncol=3,nrow=0))
+for(i in 1:length(input)){
+  m<-input[i]
+  m<-str_remove_all(m,"<|x|y|z|=|>")
+  m<-as.numeric(unlist(str_split(m,",")))
+  moons<-rbind(moons,m)}
+colnames(moons)<-c("posx","posy","posz")
+```
+
+
+```{r}
+moonmotion<-function(ms,reps){
+  r<-1
+  ms<-ms%>%mutate(velx=0,vely=0,velz=0)
+  while(r<=reps){
+    ms<-ms%>%rowwise%>%
+      ### find how much the velocity should change
+      mutate(xup=length(which(ms$posx>posx)),
+             yup=length(which(ms$posy>posy)),
+             zup=length(which(ms$posz>posz)),
+             xdown=length(which(ms$posx<posx)),
+             ydown=length(which(ms$posy<posy)),
+             zdown=length(which(ms$posz<posz)))%>%
+      ### change the velocity
+      mutate(velx=velx+xup-xdown,
+             vely=vely+yup-ydown,
+             velz=velz+zup-zdown)%>%
+      ### change the position
+      mutate(posx=posx+velx,
+             posy=posy+vely,
+             posz=posz+velz)%>%
+      ### go back to just velocity & position
+      select(posx,posy,posz,velx,vely,velz)
+    r<-r+1}
+  ms<-ms%>%rowwise%>%
+    mutate(pot=abs(posx)+abs(posy)+abs(posz),kin=abs(velx)+abs(vely)+abs(velz))%>%
+    mutate(toten=pot*kin)
+  
+  ms}
+```
+
+```{r}
+moonmotion(moons,100)
+```
+
+## Part 2
+Find the cycle for each dimension separately and then find the least common multiple of the dimensions
+
+
+```{r}
+mooncycle<-function(ms){
+  r<-1
+  ms<-ms%>%mutate(velx=0,vely=0,velz=0)
+  ### cyc is the cycle for that moon
+  cyc<-c(NA,NA,NA)
+  ### because it is cyclic, find where it reaches the original position
+  xd<-c(ms$posx,ms$velx)
+  yd<-c(ms$posy,ms$vely)
+  zd<-c(ms$posz,ms$velz)
+  while(any(is.na(cyc))){
+    ms<-ms%>%rowwise%>%
+      ### find how much the velocity should change
+      mutate(xup=length(which(ms$posx>posx)),
+             yup=length(which(ms$posy>posy)),
+             zup=length(which(ms$posz>posz)),
+             xdown=length(which(ms$posx<posx)),
+             ydown=length(which(ms$posy<posy)),
+             zdown=length(which(ms$posz<posz)))%>%
+      ### change velocity
+      mutate(velx=velx+xup-xdown,
+             vely=vely+yup-ydown,
+             velz=velz+zup-zdown)%>%
+      ### change position
+      mutate(posx=posx+velx,
+             posy=posy+vely,
+             posz=posz+velz)%>%
+      ### select velocity and position
+      select(posx,posy,posz,velx,vely,velz)
+    ### update r
+    ### x
+    if(is.na(cyc[1])){
+      if(all(xd==c(ms$posx,ms$velx))){
+        cyc[1]<-r
+        cat(r,"- x\n")}}
+    ### y
+    if(is.na(cyc[2])){
+      if(all(yd==c(ms$posy,ms$vely))){
+        cyc[2]<-r
+        cat(r,"- y\n")}}
+    ### z
+    if(is.na(cyc[3])){
+      if(all(zd==c(ms$posz,ms$velz))){
+        cyc[3]<-r
+        cat(r,"- z\n")}}
+    r<-r+1
+    if(r%%2500==0){cat(r,"-",cyc,"\n")}
+    }
+  mLCM(cyc)}
+```
+
+```{r}
+mooncycle(moons)
+```
+

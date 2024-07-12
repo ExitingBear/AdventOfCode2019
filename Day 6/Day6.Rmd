@@ -1,0 +1,67 @@
+---
+title: "Day 6 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(igraph)
+library(ggplot2)
+library(ggraph)
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+```{r}
+input<-read_lines("Day6Sample2.txt")
+
+```
+
+
+## Part 1
+Make it a graph!
+
+```{r}
+el<-matrix(ncol=2,nrow=0)
+for(i in 1:length(input)){
+  el<-rbind(el,unlist(str_split(input[i],"\\)")))}
+
+orbitmap<-graph_from_edgelist(el)
+
+```
+
+```{r}
+ggraph(orbitmap,"tree")+
+  geom_edge_diagonal()+
+  geom_node_text(aes(label=name),size=.2)
+```
+
+ego_size will tell the number of direct & indirect orbits for every object
+```{r}
+part1<-ego_size(orbitmap,order=length(V(orbitmap)),nodes=V(orbitmap),mode="in",mindist=1)
+#part1
+part1<-sum(part1)
+part1
+```
+
+## Part 2
+If I'm reading this right - I need the min distance - 2
+
+
+
+```{r}
+
+neighbors(orbitmap,"YOU",c("in"))
+neighbors(orbitmap,"SAN",c("in"))
+
+p2<-shortest_paths(orbitmap,from="YOU",to="SAN",mode=c("all"),output=c("epath"))$epath[[1]]
+p2
+part2<-length(p2)-2
+part2
+```
+

@@ -1,0 +1,134 @@
+---
+title: "Day 10 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+```{r}
+input<-read_lines("Day10Sample5.txt")
+```
+
+
+## Part 1
+
+Really horrible way to do this but:
+1 - put the asteroids in a df
+2 - for each, find the tan(x/2) for all the other the things in the data.frame
+3 - count the different answers.
+
+```{r}
+asteroidframe<-as.data.frame(matrix(ncol=2,nrow=0))
+```
+
+```{r}
+for(i in 1:length(input)){
+  rw<-input[i]
+  for(j in 1:nchar(rw)){
+    if(str_sub(rw,j,j)=="#"){
+      asteroidframe<-rbind(asteroidframe,list(j,i))}}}
+colnames(asteroidframe)<-c("x","y")
+```
+
+
+the function reads the asteroid frame and lists 
+```{r}
+asteroidplacement<-function(aframe){
+  outframe<-as.data.frame(matrix(ncol=3,nrow=0))
+  for(i in 1:nrow(aframe)){
+    a<-aframe[i,]
+    af<-aframe[-i,]
+    af<-af%>%rowwise%>%
+      mutate(dy=y-a$y,dx=x-a$x)%>%
+      ### this is the formula for tan(x/2) - it repeats once every circle, so if two
+      ### point have the same value, they're in line
+      mutate(thalf=round((dy/(sqrt(dx^2+dy^2)+dx)),10))
+    ### for some reason that isn't clear to me, this balked when it was combined.
+    seen<-af$thalf
+    seen<-unique(af$thalf)
+    seen<-length(seen)
+    outframe<-rbind(outframe,list(a$x,a$y,seen))}
+  colnames(outframe)<-c("x","y","seen")
+outframe}
+
+```
+
+
+```{r}
+p1<-asteroidplacement(asteroidframe)
+part1<-max(p1$seen)
+part1
+```
+## Part 2
+
+First make a tiny change to asteroidplacement to give the list of the best place to put the laser
+
+```{r}
+ap2<-function(aframe){
+  outframe<-as.data.frame(matrix(ncol=3,nrow=0))
+  maxseen<-0
+  for(i in 1:nrow(aframe)){
+    a<-aframe[i,]
+    af<-aframe[-i,]
+    af<-af%>%rowwise%>%
+      mutate(dy=a$y-y,dx=a$x-x)%>%
+      mutate(thalf=round((dy/(sqrt(dx^2+dy^2)+dx)),10))
+    seen<-af$thalf
+    seen<-unique(af$thalf)
+    seen<-length(seen)
+    ### this returns the list of all places for the highest number seen. 
+    if(seen>maxseen){
+      maxseen<-seen
+      outframe<-af
+      bestplace<-c(unlist(a),seen)}}
+  cat(paste(bestplace),"\n")
+  outframe}
+
+
+```
+
+
+```{r}
+p2<-ap2(asteroidframe)
+huh<-p2
+```
+Now, manipulate these into order
+
+```{r}
+p2<-huh
+### first - change the Infinities to just be really big - The actual value doesn't matter, they just all need to be the same thing and all need to be bigger than any of the other things
+p2<-p2%>%mutate_all(~replace(.,is.nan(.),1000+(max(p2$thalf,na.rm=TRUE))))%>%
+  ###then I will need to sort all greater than 1 first, then to infinity, then from 
+  ###and need their manhattan distance for later sorting
+  mutate(pos=ifelse(thalf>=1,1,2),md=abs(dy)+abs(dx))%>%
+  ### then group by tf & number by md
+  arrange(md)%>%
+  group_by(thalf)%>%
+  mutate(closest=row_number())%>%
+  ### ungroup
+  rowwise%>% ungroup%>%
+  ### inner ring (closest), then positives before negatives, then thalf min to max
+  arrange(closest,pos,thalf)
+
+```
+
+Get row 200 & subtract 1
+```{r}
+sapply(c(1,2,3,10,20,50,100,199,200,201,299),function(q){
+  x<-((c(q,p2$x[q],p2$y[q])-c(0,1,1)))
+  x})
+
+part2<-sum((c(p2$x[200],p2$y[200])-c(1,1))*c(100,1))
+part2
+```
+

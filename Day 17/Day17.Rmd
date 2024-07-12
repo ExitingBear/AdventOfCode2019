@@ -1,0 +1,361 @@
+---
+title: "Day XX Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+## The Intcode
+
+```{r}
+iccomp<-function(prg,inp,starthere,relativebase,quiet){
+  i<-starthere
+  outp<-c()
+  while(prg[i]!=99){
+    ## make sure that at least the next three numbers exist
+    if((i+3)>length(prg)){
+      prg<-c(prg,
+             rep(0,(i+3-length(prg))))}
+    opcode<-as.character(prg[i]%%100)
+    firstp<-(prg[i]%/%100)%%10
+    secondp<-(prg[i]%/%1000)%%10
+    thirdp<-prg[i]%/%10000
+    #   if(quiet==F){cat("i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")}
+    switch(opcode,
+           ### add
+           "1"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a+b
+             i<-i+4},
+           ### multiply
+           "2"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a*b
+             i<-i+4},
+           ### input
+           "3"={
+             if(firstp==0){a<-prg[i+1]}
+             if(firstp==2){a<-prg[i+1]+relativebase}
+             if(is.na(a)){a<-0}
+             if(length(inp)==0){
+               if(quiet==F){cat("waiting---\n")}
+               return(list(prg,outp,i,relativebase))
+             }else{
+               if(quiet==F){cat("input: ",inp[1]," - ")}
+               prg[a+1]<-inp[1]
+               inp<-inp[-1]
+               i<-i+2}},
+           ### output
+           "4"={
+             a<-prg[i+1]
+             if(firstp==0){
+               # if(quiet==F){cat("looking here: ",a+1,"\n")}
+               a<-prg[a+1]}
+             if(firstp==2){
+               #   if(quiet==F){cat("looking here: ",a+1+relativebase,"\n")}
+               a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(quiet==F){cat("output: ",a,"\n")}
+             outp<-c(outp,a)
+             i<-i+2},
+           ### jump if true
+           "5"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a!=0){i<-b+1}else{i<-i+3}},
+           ### jump if false
+           "6"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a==0){i<-b+1}else{i<-i+3}},
+           ### less than
+           "7"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a<b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "8"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a==b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "9"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             relativebase<-relativebase+a
+             i<-i+2},
+           {cat(i,": unknown opcode",opcode,"\n")
+             break})
+    prg<-replace(prg,is.na(prg),0)}
+  #  cat("ENDING i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")
+  return(list(prg,outp,0,relativebase))}
+```
+
+
+```{r}
+input<-read_lines("../../AoCData/AOC2019/Day17.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
+
+```
+
+
+## Part 1 
+For part 1, just run the intcode - 
+
+```{r}
+p1<-iccomp(intcode,c(),1,0,T)
+asciiscaffold<-p1[[2]]
+```
+
+Having run it, then graph the scaffolding
+
+
+First, transform the scaffolding into a matrix:
+```{r}
+nc<-min(which(asciiscaffold==10)-1)
+p1asciimatrix<-matrix(ncol=nc,nrow=0)
+ln<-1
+sl<-c()
+for(i in 1:length(asciiscaffold)){
+  vw<-asciiscaffold[i]
+  ### if at the end of the row
+  if(vw==10){
+    ### check to see if it's a full row, if so - add it to the matrix
+    if(length(sl)==nc){
+      p1asciimatrix<-rbind(p1asciimatrix,sl)
+      ### otherwise, translate it
+      }else{sl<-sapply(sl,intToUtf8)
+      cat(sl,"\n")}
+    ### move forward a line & reset sl
+    ln<-ln+1
+    sl<-c()
+    ### otherwise, append to the end of the line
+  }else{sl<-c(sl,vw)}}
+```
+
+
+Then graph what we have:
+
+```{r}
+sdf<-melt(unname(p1asciimatrix))
+basicgraph<-ggplot()+
+  geom_tile(data=sdf,aes(x=Var2,y=Var1,fill=value))+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  scale_y_reverse()+
+  coord_fixed()
+basicgraph
+```
+Kind of pretty - 
+
+
+To find the intersections - just change from the ascii to 0/1
+
+```{r}
+nc<-ncol(p1asciimatrix)
+nr<-nrow(p1asciimatrix)
+intersectfinder<-p1asciimatrix
+intersectfinder[which(p1asciimatrix==46)]<-0
+intersectfinder[which(p1asciimatrix==35)]<-1
+intersectfinder[which(!p1asciimatrix%in%c(35,46))]<- -1
+intersectfinder<-matrix(intersectfinder,ncol=nc,nrow=nr)
+```
+
+To find the intersections, add around - if the 3x3 box enclosing the point is sums to 5, it's an intersection.
+
+
+```{r}
+alignparams<-0
+for(i in  2:(nrow(intersectfinder)-1)){
+  for(j in 2:(ncol(intersectfinder)-1)){
+    if(intersectfinder[(i+1),j]+intersectfinder[(i-1),j]+intersectfinder[i,(j+1)]+intersectfinder[i,(j-1)]+intersectfinder[i,j]==5){
+      cat(i,j,"\n")
+      alignparams<-alignparams+((i-1)*(j-1))}}}
+alignparams
+```
+## Part 2
+
+I'll admit, most of this was done manually - because it was easier:
+
+|   |   |
+| ----- | --- | 
+| 23,9   | L8 | 
+| 23,1   | R12 | 
+| 11,1   | R12 | 
+| 11,13  | R10 | 
+| 21,13  | R10 | 
+| 21,3   | R12 | 
+| 9,3    | R10 | 
+| 9,13   | L8 | 
+| 1,13   | R12 | 
+| 1,25   | R12 | 
+| 13,25  | R10 | 
+| 13,15  | R10 | 
+| 3,15   | R12 | 
+| 3,27   | R10 | 
+| 13,27  | L10 | 
+| 13,37  | R10 | 
+| 23,37  | L6 | 
+| 23,43  | L10 | 
+| 13,43  | R10 | 
+| 13,53  | L6 | 
+| 7,53   | R10 | 
+| 7,63   | R12 | 
+| 19,63  | R10 | 
+| 19,53  | L8 | 
+| 27,53  | R12 | 
+| 27,41  | R12 | 
+| 15,41  | R10 | 
+| 15,51  | R10 | 
+| 25,51  | R12 | 
+| 25,39  | R10 | 
+| 15,39  | L10 | 
+| 15,29  | R10 | 
+| 5,29   | L6 | 
+| 5,23   |    |
+
+
+
+
+Breaking that down:
+
+```{r}
+#A
+amess<-"L,8,R,12,R,12,R,10"
+#B
+bmess<-"L,10,R,10,L,6"
+#C
+cmess<-"R,10,R,12,R,10"
+#MAIN
+mainmess<-"A,C,A,C,B,B,C,A,C,B"
+```
+
+Concatenate these altogether so the input takes care of itself along the way:
+
+```{r}
+
+mainmess<-c(sapply(unlist(str_split(mainmess,"")),utf8ToInt),10)
+amess<-c(sapply(unlist(str_split(amess,"")),utf8ToInt),10)
+bmess<-c(sapply(unlist(str_split(bmess,"")),utf8ToInt),10)
+cmess<-c(sapply(unlist(str_split(cmess,"")),utf8ToInt),10)
+
+allmess<-c(mainmess,amess,bmess,cmess,utf8ToInt("n"),10)
+allmess
+
+```
+Then, run it after its set to 2
+
+```{r}
+p2prg<-intcode
+p2prg[1]<-2
+p2out<-iccomp(p2prg,allmess,1,0,F)
+```
+
+The answer is 945911
+
+```{r}
+finalout<-p2out[[2]]
+```
+
+```{r}
+p2asciimatrix<-matrix(ncol=nc,nrow=0)
+ln<-1
+sl<-c()
+for(i in 1:length(finalout)){
+  vw<-finalout[i]
+  ### if at the end of the row
+  if(vw==10){
+    ### check to see if it's a full row, if so - add it to the matrix
+    if(length(sl)==nc){
+      p2asciimatrix<-rbind(p2asciimatrix,sl)
+      ### otherwise, translate it
+      }else{
+        sl<-sapply(sl,intToUtf8)
+        cat(str_flatten(sl),"\n")}
+    ### move forward a line & reset sl
+    ln<-ln+1
+    sl<-c()
+    ### otherwise, append to the end of the line
+  }else{sl<-c(sl,vw)}}
+```
+```{r}
+sdf2<-melt(unname(p2asciimatrix))
+basicgraph<-ggplot()+
+  geom_tile(data=sdf2,aes(x=Var2,y=Var1,fill=value))+
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  scale_y_reverse()+
+  coord_fixed()
+basicgraph
+```
