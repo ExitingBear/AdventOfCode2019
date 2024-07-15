@@ -1,13 +1,10 @@
 ---
-title: "Day XX Notebook"
+title: "Day 20 Notebook"
 output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
-library(igraph)
 library(ggplot2)
-library(rgl)
-library(ggraph)
 library(reshape2)
 library(knitr)
 library(dplyr)
@@ -19,32 +16,390 @@ options(scipen = 999)
 ```
 
 ```{r}
-input<-read_lines("DayXXSample.txt")
-#input<-read_lines("../../AoCData/AOC2018/DayXX.txt")
+#input<-read_lines("Day20Sample3.txt")
+input<-read_lines("../../AoCData/AOC2019/Day20.txt")
+
+```
+
+
+```{r}
+input[20]
+```
+
+
+## Part 1
+
+It's going to be a BFS
+```{r}
+twentymaze<-function(inp){
+  mz<-dict()
+  portals<-dict()
+  ### start by parsing the maze
+  for(i in 1:length(input)){
+    inln<-inp[i]
+    for(j in 1:nchar(inln)){
+      if(str_sub(inln,j,j)=="."){
+        ### check above
+        if(str_sub(inp[i-1],j,j)%in%LETTERS){
+          p<-str_c(str_sub(inp[i-2],j,j),str_sub(inp[i-1],j,j))
+          mz$set(str_flatten(c(j,i)," "),p)
+          portals$set(p,c(portals$get(p,default=c()),str_flatten(c(j,i)," ")))
+        ### check below
+        }else if(str_sub(inp[i+1],j,j)%in%LETTERS){
+          p<-str_c(str_sub(inp[i+1],j,j),str_sub(inp[i+2],j,j))
+          mz$set(str_flatten(c(j,i)," "),p)
+          portals$set(p,c(portals$get(p,default=c()),str_flatten(c(j,i)," ")))
+        ### check left
+        }else if(str_sub(inp[i],j-1,j-1)%in%LETTERS){
+          p<-str_sub(inp[i],j-2,j-1)
+          mz$set(str_flatten(c(j,i)," "),p)
+          portals$set(p,c(portals$get(p,default=c()),str_flatten(c(j,i)," ")))
+        ### check right
+        }else if(str_sub(inp[i],j+1,j+1)%in%LETTERS){
+          p<-str_sub(inp[i],j+1,j+2)
+          mz$set(str_flatten(c(j,i)," "),p)
+          portals$set(p,c(portals$get(p,default=c()),str_flatten(c(j,i)," ")))        
+        ### non portal paths
+        }else{
+          mz$set(str_flatten(c(j,i)," "),".")}}}}
+  ### basic bfs starting from AA
+  beenthere<-dict()
+  AA<-as.numeric(unlist(str_split(portals$get("AA")," ")))
+  ZZ<-as.numeric(unlist(str_split(portals$get("ZZ")," ")))
+  pq<-priority_queue()
+  ### q <- x,y,steps
+  pq$push(c(AA[1],AA[2],0),0)
+  portallist<-unlist(portals$keys())
+  while(pq$size()>0){
+    curr<-pq$pop()
+    currx<-curr[1]
+    curry<-curr[2]
+    currs<-curr[3]
+    ### if done, stop
+    if(currx==ZZ[1]&curry==ZZ[2]){
+      ### to account for adding 2 when going to ZZ
+      currs<-currs-1
+      return(currs)
+      break}
+    ### if have been there, stop
+    if(beenthere$has(str_flatten(c(currx,curry)," "))){next}
+    ### put in list of been there
+    beenthere$set(str_flatten(c(currx,curry)," "),currs)
+    ### up
+    if(mz$has(str_flatten(c(currx,curry-1)," "))){
+      ### if on a portal, go to all of the other portals
+      u<-mz$get(str_flatten(c(currx,curry-1)," "))
+      if(u%in%portallist){
+        u<-portals$get(u)
+        for(i in 1:length(u)){
+          xx<-as.numeric(unlist(str_split(u[i]," ")))
+          pq$push(c(xx[1],xx[2],currs+2),-currs-1-abs(xx[1]-ZZ[1])-abs(xx[2]-ZZ[2]))}
+      }else{pq$push(c(currx,curry-1,currs+1),-currs-1-abs(currx-ZZ[1])-abs(curry-1-ZZ[2]))}}
+    ### down
+    if(mz$has(str_flatten(c(currx,curry+1)," "))){
+      ### if on a portal, go to all of the other portals
+      d<-mz$get(str_flatten(c(currx,curry+1)," "))
+      if(d%in%portallist){
+        d<-portals$get(d)
+        for(i in 1:length(d)){
+          xx<-as.numeric(unlist(str_split(d[i]," ")))
+          pq$push(c(xx[1],xx[2],currs+2),-currs-1-abs(xx[1]-ZZ[1])-abs(xx[2]-ZZ[2]))} 
+      }else{pq$push(c(currx,curry+1,currs+1),-currs-1-abs(currx-ZZ[1])-abs(curry+1-ZZ[2]))}}
+    ### left
+    if(mz$has(str_flatten(c(currx-1,curry)," "))){
+      ### if on a portal, go to all of the other portals
+      l<-mz$get(str_flatten(c(currx-1,curry)," "))
+      if(l%in%portallist){
+        l<-portals$get(l)
+        for(i in 1:length(l)){
+          xx<-as.numeric(unlist(str_split(l[i]," ")))
+          pq$push(c(xx[1],xx[2],currs+2),-currs-1-abs(xx[1]-ZZ[1])-abs(xx[2]-ZZ[2]))}
+      }else{pq$push(c(currx-1,curry,currs+1),-currs-1-abs(currx-1-ZZ[1])-abs(curry-ZZ[2]))}}
+    ### right
+    if(mz$has(str_flatten(c(currx+1,curry)," "))){
+      ### if on a portal, go to all of the other portals
+      r<-mz$get(str_flatten(c(currx+1,curry)," "))
+      if(r%in%portallist){
+        r<-portals$get(r)
+        for(i in 1:length(r)){
+          xx<-as.numeric(unlist(str_split(r[i]," ")))
+          pq$push(c(xx[1],xx[2],currs+2),-currs-1-abs(xx[1]-ZZ[1])-abs(xx[2]-ZZ[2]))}
+    }else{pq$push(c(currx+1,curry,currs+1),-currs-1-abs(currx+1-ZZ[1])-abs(curry-ZZ[2]))}}}
+  cat("no end\n")
+  portallist}
 
 ```
 
 ```{r}
-### Matrix
-diagnosticreport<-matrix(0,nrow=length(input),ncol=nchar(input[1]))
-for(i in 1:length(input)){diagnosticreport[i,]<-as.numeric(unlist(str_split(input[i],"")))}
+part1<-twentymaze(input)
+part1
+```
+## Part 2
+
+
+```{r}
+twentydonut<-function(inp){
+  mz<-dict()
+  internals<-dict()
+  externals<-dict()
+  rightedge<-nchar(inp[3])-2
+  bottomedge<-length(inp)-2
+  ### start by parsing the maze
+  for(i in 1:length(input)){
+    inln<-inp[i]
+    for(j in 1:nchar(inln)){
+      ## if around the edge, this is an external
+      if(i==3||j==3||i==bottomedge||j==rightedge){outside<-T}else{outside<-F}
+      if(str_sub(inln,j,j)=="."){
+        ### check above
+        if(str_sub(inp[i-1],j,j)%in%LETTERS){
+          p<-str_c(str_sub(inp[i-2],j,j),str_sub(inp[i-1],j,j))
+        ### check below
+        }else if(str_sub(inp[i+1],j,j)%in%LETTERS){
+          p<-str_c(str_sub(inp[i+1],j,j),str_sub(inp[i+2],j,j))
+        ### check left
+        }else if(str_sub(inp[i],j-1,j-1)%in%LETTERS){
+          p<-str_sub(inp[i],j-2,j-1)
+        ### check right
+        }else if(str_sub(inp[i],j+1,j+1)%in%LETTERS){
+          p<-str_sub(inp[i],j+1,j+2)
+        ### non portal paths
+        }else{p<-"."}
+        if(p!="."){
+          if(outside){externals$set(p,str_flatten(c(j,i)," "))}else{internals$set(p,str_flatten(c(j,i)," "))}}
+        mz$set(str_flatten(c(j,i)," "),p)}}}
+  ### basic bfs starting from AA
+  beenthere<-dict()
+  AA<-as.numeric(unlist(str_split(externals$get("AA")," ")))
+  ZZ<-as.numeric(unlist(str_split(externals$get("ZZ")," ")))
+  pq<-priority_queue()
+  ### q <- x,y, layer, steps
+  pq$push(c(AA[1],AA[2],0,0),0)
+  extlist<-unlist(externals$keys())
+  intlist<-unlist(internals$keys())
+  portallist<-c(extlist,intlist)
+  maxlevel<-0
+  roundcount<-1
+  while(pq$size()>0){
+    curr<-pq$pop()
+    currx<-curr[1]
+    curry<-curr[2]
+    currl<-curr[3]
+    if(currl>maxlevel){
+      cat(curr,"\n")
+      maxlevel<-currl
+    }
+    currs<-curr[4]
+    ### if done, stop
+    if(currx==ZZ[1]&&curry==ZZ[2]&&currl==0){
+      ### to account for adding 2 when going to ZZ
+      cat(roundcount,"-",curr,"\n")
+      return(currs)
+      break}
+    ### if you're on a negative level, stop
+    if(currl<0){next}
+    ### if have been there, stop
+    if(beenthere$has(str_flatten(c(currx,curry,currl)," "))){next}
+    ### put in list of been there
+    beenthere$set(str_flatten(c(currx,curry,currl)," "),currs)
+    ### up
+    if(mz$has(str_flatten(c(currx,curry-1)," "))){
+      ### if on a portal, go to all of the other portals
+      if((curry-1)==3){outside<-T}else{outside<-F}
+      ### u is whatever is there
+      u<-mz$get(str_flatten(c(currx,curry-1)," "))
+      ### if on a portal && not AA or ZZ go to the opposite portal
+      if(u%in%portallist&&u!="AA"&u!="ZZ"){
+        if(outside){u<-internals$get(u)
+        lc<-currl-1}else{u<-externals$get(u)
+        lc<-currl+1}
+        u<-as.numeric(unlist(str_split(u," ")))
+        pq$push(c(u[1],u[2],lc,currs+2),-currs-1-abs(u[1]-ZZ[1])-abs(u[2]-ZZ[2])-(27*lc)) 
+        ### if not a portal, just stop 
+      }else{pq$push(c(currx,curry-1,currl,currs+1),-currs-1-abs(currx-ZZ[1])-abs(curry-1-ZZ[2])-(27*currl))}}
+    ### down
+    if(mz$has(str_flatten(c(currx,curry+1)," "))){
+      if((curry+1)==bottomedge){outside<-T}else{outside<-F}
+      ### d is whatever is there
+      d<-mz$get(str_flatten(c(currx,curry+1)," "))
+      ### if on a portal && not AA or ZZ go to the opposite portal
+      if(d%in%portallist&&d!="AA"&d!="ZZ"){
+        if(outside){d<-internals$get(d)
+        lc<-currl-1}else{d<-externals$get(d)
+        lc<-currl+1}
+        d<-as.numeric(unlist(str_split(d," ")))
+        pq$push(c(d[1],d[2],lc,currs+2),-currs-1-abs(d[1]-ZZ[1])-abs(d[2]-ZZ[2])-(27*lc)) 
+        ### if not a portal, just stop 
+      }else{pq$push(c(currx,curry+1,currl,currs+1),-currs-1-abs(currx-ZZ[1])-abs(curry+1-ZZ[2])-(27*currl))}}
+    ### left
+    if(mz$has(str_flatten(c(currx-1,curry)," "))){
+      if((currx-1)==3){outside<-T}else{outside<-F}
+      ### l is whatever is there
+      l<-mz$get(str_flatten(c(currx-1,curry)," "))
+      ### if on a portal && not AA or ZZ go to the opposite portal
+      if(l%in%portallist&&l!="AA"&l!="ZZ"){
+        if(outside){l<-internals$get(l)
+        lc<-currl-1}else{l<-externals$get(l)
+        lc<-currl+1}
+        l<-as.numeric(unlist(str_split(l," ")))
+        pq$push(c(l[1],l[2],lc,currs+2),-currs-1-abs(l[1]-ZZ[1])-abs(l[2]-ZZ[2])-(27*lc)) 
+        ### if not a portal, just stop 
+      }else{pq$push(c(currx-1,curry,currl,currs+1),-currs-1-abs(currx-1-ZZ[1])-abs(curry-ZZ[2])-(27*currl))}}
+    ### right
+    if(mz$has(str_flatten(c(currx+1,curry)," "))){
+      if((currx+1)==rightedge){outside<-T}else{outside<-F}
+      ### r is whatever is there
+      r<-mz$get(str_flatten(c(currx+1,curry)," "))
+      ### if on a portal && not AA or ZZ go to the opposite portal
+      if(r%in%portallist&&r!="AA"&r!="ZZ"){
+        if(outside){r<-internals$get(r)
+        lc<-currl-1}else{r<-externals$get(r)
+        lc<-currl+1}
+        r<-as.numeric(unlist(str_split(r," ")))
+        pq$push(c(r[1],r[2],lc,currs+2),-currs-1-abs(r[1]-ZZ[1])-abs(r[2]-ZZ[2])-(27*lc)) 
+        ### if not a portal, just stop 
+      }else{pq$push(c(currx+1,curry,currl,currs+1),-currs-1-abs(currx+1-ZZ[1])-abs(curry-ZZ[2])-(27*currl))}}
+    roundcount<-roundcount+1}
+  cat("no end\n")
+  portallist}
 
 ```
 
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse()+
-  coord_fixed()
-basicgraph
+
+
+
+```{r}
+part2<-twentydonut(input)
+part2
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+BETTER SINGLE LAYER
+
+```{r}
+twentydonut<-function(inp){
+  mz<-dict()
+  internals<-dict()
+  externals<-dict()
+  rightedge<-nchar(inp[3])-2
+  bottomedge<-length(inp)-2
+  ### start by parsing the maze
+  for(i in 1:length(input)){
+    inln<-inp[i]
+    for(j in 1:nchar(inln)){
+      ## if around the edge, this is an external
+      if(i==3||j==3||i==bottomedge||j==rightedge){outside<-T}else{outside<-F}
+      if(str_sub(inln,j,j)=="."){
+        ### check above
+        if(str_sub(inp[i-1],j,j)%in%LETTERS){
+          p<-str_c(str_sub(inp[i-2],j,j),str_sub(inp[i-1],j,j))
+        ### check below
+        }else if(str_sub(inp[i+1],j,j)%in%LETTERS){
+          p<-str_c(str_sub(inp[i+1],j,j),str_sub(inp[i+2],j,j))
+        ### check left
+        }else if(str_sub(inp[i],j-1,j-1)%in%LETTERS){
+          p<-str_sub(inp[i],j-2,j-1)
+        ### check right
+        }else if(str_sub(inp[i],j+1,j+1)%in%LETTERS){
+          p<-str_sub(inp[i],j+1,j+2)
+        ### non portal paths
+        }else{p<-"."}
+        if(p!="."){
+          if(outside){externals$set(p,str_flatten(c(j,i)," "))}else{internals$set(p,str_flatten(c(j,i)," "))}}
+        mz$set(str_flatten(c(j,i)," "),p)}}}
+  ### basic bfs starting from AA
+  beenthere<-dict()
+  AA<-as.numeric(unlist(str_split(externals$get("AA")," ")))
+  ZZ<-as.numeric(unlist(str_split(externals$get("ZZ")," ")))
+  pq<-priority_queue()
+  ### q <- x,y,steps
+  pq$push(c(AA[1],AA[2],0),0)
+  extlist<-unlist(externals$keys())
+  cat(extlist,"\n")
+  intlist<-unlist(internals$keys())
+  cat(intlist,"\n")
+  portallist<-c(extlist,intlist)
+  while(pq$size()>0){
+    curr<-pq$pop()
+    currx<-curr[1]
+    curry<-curr[2]
+    currs<-curr[3]
+    ### if done, stop
+    if(currx==ZZ[1]&curry==ZZ[2]){
+      ### to account for adding 2 when going to ZZ
+      return(currs)
+      break}
+    ### if have been there, stop
+    if(beenthere$has(str_flatten(c(currx,curry)," "))){next}
+    ### put in list of been there
+    beenthere$set(str_flatten(c(currx,curry)," "),currs)
+    ### up
+    if(mz$has(str_flatten(c(currx,curry-1)," "))){
+      ### if on a portal, go to all of the other portals
+      if((curry-1)==3){outside<-T}else{outside<-F}
+      ### u is whatever is there
+      u<-mz$get(str_flatten(c(currx,curry-1)," "))
+      ### if on a portal && not AA or ZZ go to the opposite portal
+      if(u%in%portallist&&u!="AA"&u!="ZZ"){
+        if(outside){u<-internals$get(u)}else{u<-externals$get(u)}
+        u<-as.numeric(unlist(str_split(u," ")))
+        pq$push(c(u[1],u[2],currs+2),-currs-1-abs(u[1]-ZZ[1])-abs(u[2]-ZZ[2])) 
+        ### if not a portal, just stop 
+      }else{pq$push(c(currx,curry-1,currs+1),-currs-1-abs(currx-ZZ[1])-abs(curry-1-ZZ[2]))}}
+    ### down
+    if(mz$has(str_flatten(c(currx,curry+1)," "))){
+      if((curry+1)==bottomedge){outside<-T}else{outside<-F}
+      ### d is whatever is there
+      d<-mz$get(str_flatten(c(currx,curry+1)," "))
+      ### if on a portal && not AA or ZZ go to the opposite portal
+      if(d%in%portallist&&d!="AA"&d!="ZZ"){
+        if(outside){d<-internals$get(d)}else{d<-externals$get(d)}
+        d<-as.numeric(unlist(str_split(d," ")))
+        pq$push(c(d[1],d[2],currs+2),-currs-1-abs(d[1]-ZZ[1])-abs(d[2]-ZZ[2])) 
+        ### if not a portal, just stop 
+      }else{pq$push(c(currx,curry+1,currs+1),-currs-1-abs(currx-ZZ[1])-abs(curry+1-ZZ[2]))}}
+    ### left
+    if(mz$has(str_flatten(c(currx-1,curry)," "))){
+      if((currx-1)==3){outside<-T}else{outside<-F}
+      ### l is whatever is there
+      l<-mz$get(str_flatten(c(currx-1,curry)," "))
+      ### if on a portal && not AA or ZZ go to the opposite portal
+      if(l%in%portallist&&l!="AA"&l!="ZZ"){
+        if(outside){l<-internals$get(l)}else{l<-externals$get(l)}
+        l<-as.numeric(unlist(str_split(l," ")))
+        pq$push(c(l[1],l[2],currs+2),-currs-1-abs(l[1]-ZZ[1])-abs(l[2]-ZZ[2])) 
+        ### if not a portal, just stop 
+      }else{pq$push(c(currx-1,curry,currs+1),-currs-1-abs(currx-1-ZZ[1])-abs(curry-ZZ[2]))}}
+    ### right
+    if(mz$has(str_flatten(c(currx+1,curry)," "))){
+      if((currx+1)==rightedge){outside<-T}else{outside<-F}
+      ### r is whatever is there
+      r<-mz$get(str_flatten(c(currx+1,curry)," "))
+      ### if on a portal && not AA or ZZ go to the opposite portal
+      if(r%in%portallist&&r!="AA"&r!="ZZ"){
+        if(outside){r<-internals$get(r)}else{r<-externals$get(r)}
+        r<-as.numeric(unlist(str_split(r," ")))
+        pq$push(c(r[1],r[2],currs+2),-currs-1-abs(r[1]-ZZ[1])-abs(r[2]-ZZ[2])) 
+        ### if not a portal, just stop 
+      }else{pq$push(c(currx+1,curry,currs+1),-currs-1-abs(currx+1-ZZ[1])-abs(curry-ZZ[2]))}}}
+  cat("no end\n")
+  portallist}
+
+```
+
+
+
+
+
 
