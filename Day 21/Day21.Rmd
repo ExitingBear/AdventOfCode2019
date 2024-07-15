@@ -18,33 +18,287 @@ library(collections)
 options(scipen = 999)
 ```
 
-```{r}
-input<-read_lines("DayXXSample.txt")
-#input<-read_lines("../../AoCData/AOC2018/DayXX.txt")
 
+## The Intcode
+
+```{r}
+iccomp<-function(prg,inp,starthere,relativebase,quiet){
+  i<-starthere
+  outp<-c()
+  while(prg[i]!=99){
+    ## make sure that at least the next three numbers exist
+    if((i+3)>length(prg)){
+      prg<-c(prg,
+             rep(0,(i+3-length(prg))))}
+    opcode<-as.character(prg[i]%%100)
+    firstp<-(prg[i]%/%100)%%10
+    secondp<-(prg[i]%/%1000)%%10
+    thirdp<-prg[i]%/%10000
+    #   if(quiet==F){cat("i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")}
+    switch(opcode,
+           ### add
+           "1"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a+b
+             i<-i+4},
+           ### multiply
+           "2"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a*b
+             i<-i+4},
+           ### input
+           "3"={
+             if(firstp==0){a<-prg[i+1]}
+             if(firstp==2){a<-prg[i+1]+relativebase}
+             if(is.na(a)){a<-0}
+             if(length(inp)==0){
+               if(quiet==F){cat("waiting---\n")}
+               return(list(prg,outp,i,relativebase))
+             }else{
+               if(quiet==F){cat("input: ",inp[1]," - ")}
+               prg[a+1]<-inp[1]
+               inp<-inp[-1]
+               i<-i+2}},
+           ### output
+           "4"={
+             a<-prg[i+1]
+             if(firstp==0){
+               # if(quiet==F){cat("looking here: ",a+1,"\n")}
+               a<-prg[a+1]}
+             if(firstp==2){
+               #   if(quiet==F){cat("looking here: ",a+1+relativebase,"\n")}
+               a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(quiet==F){cat("output: ",a,"\n")}
+             outp<-c(outp,a)
+             i<-i+2},
+           ### jump if true
+           "5"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a!=0){i<-b+1}else{i<-i+3}},
+           ### jump if false
+           "6"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a==0){i<-b+1}else{i<-i+3}},
+           ### less than
+           "7"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a<b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "8"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a==b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "9"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             relativebase<-relativebase+a
+             i<-i+2},
+           {cat(i,": unknown opcode",opcode,"\n")
+             break})
+    prg<-replace(prg,is.na(prg),0)}
+  #  cat("ENDING i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")
+  return(list(prg,outp,0,relativebase))}
+```
+
+
+```{r}
+input<-read_lines("../../AoCData/AOC2019/Day21.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
 ```
 
 ```{r}
-### Matrix
-diagnosticreport<-matrix(0,nrow=length(input),ncol=nchar(input[1]))
-for(i in 1:length(input)){diagnosticreport[i,]<-as.numeric(unlist(str_split(input[i],"")))}
-
+inst2ascii<-function(a){
+  a<-c(sapply(unlist(str_split(a,"")),utf8ToInt),10)
+a}
 ```
+
+
+```{r}
+ascii2inst<-function(a){
+  a<-str_flatten(sapply(a,intToUtf8))
+a}
+```
+
+I think, jump if (A==0 or if B==0 or if C==0) and D==1
+
+NOT A T (t = 1 if A=0)
+OR  T J (j =1 if !A)
+NOT B T (t =1 if B=0)
+OR  T J (j =1 if B=0)
+NOT C T (t =1 if C=0)
+OR  T J (j =1 if C=0)
+AND D J (if there was a hole earlier, and there's ground, jump)
+WALK
+
+----------------
+OR A T (t=1 if A=1)
+AND B T (t=1 if both A&B are 1)
+AND C T (t=1 if A&B&C are 1 - no holes)
+NOT T J (J=1 if there's a hole)
+AND D J (J=1 if there's a hole and D is ground)
+
+
+```{r}
+x<- c(inst2ascii("OR A T"),
+      inst2ascii("AND B T"),
+      inst2ascii("AND C T"),
+      inst2ascii("NOT T J"),
+      inst2ascii("AND D J"),
+      inst2ascii("WALK"))
+```
+
+
+```{r}
+try<-iccomp(intcode,x,1,0,F)
+```
+
+```{r}
+whathappened<-try[[2]]
+```
+
+```{r}
+tail(try[[2]],1)
+cat(ascii2inst((whathappened[-length(whathappened)])))
+```
+## Part 2
+
+Just a quick "what does it look like when I run" thing:
+
+
+```{r}
+x<- c(inst2ascii("OR A T"),
+      inst2ascii("AND B T"),
+      inst2ascii("AND C T"),
+      inst2ascii("NOT T J"),
+      inst2ascii("AND D J"),
+      inst2ascii("AND H J"),
+      inst2ascii("RUN"))
+```
+
+
+
+```{r}
+try<-iccomp(intcode,x,1,0,F)
+```
+
+
+```{r}
+whathappened<-try[[2]]
+```
+
+```{r}
+cat(ascii2inst(whathappened))
+```
+
+
+Doesn't work because it could make H or E
+
+OR A T (t=1 if A=1)
+AND B T (t=1 if both A&B are 1)
+AND C T (t=1 if A&B&C are 1 - no holes)
+NOT T J (J=1 if there's a hole)
+AND J T (clears T)
+OR E T 
+OR H T  (if there's ground in E or H, T = 1)  (so it can go forward at least one or jump again)
+AND T J (maybe jump)
+AND D J (J=1 D is ground)
+
+### T = 1 if no holes, T=0 if holes ;
+
+```{r}
+x<- c(inst2ascii("OR A T"),
+      inst2ascii("AND B T"),
+      inst2ascii("AND C T"),
+      inst2ascii("NOT T J"),
+      inst2ascii("AND J T"),
+      inst2ascii("OR E T"),
+      inst2ascii("OR H T"),
+      inst2ascii("AND T J"),
+      inst2ascii("AND D J"),
+      inst2ascii("RUN"))
+```
+
+
+
+
+try<-iccomp(intcode,x,1,0,F)
+
+```{r}
+try<-iccomp(intcode,x,1,0,F)
+whathappened<-try[[2]]
+cat(ascii2inst(whathappened))
+```
+
+
+
 
 
 ```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse()+
-  coord_fixed()
-basicgraph
+# basicgraph<-ggplot()+
+#   theme(axis.text.x = element_blank(),
+#         axis.ticks.x = element_blank(),
+#         axis.text.y = element_blank(),
+#         axis.ticks.y = element_blank(),
+#         axis.title.y = element_blank(),
+#         axis.title.x = element_blank(),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         legend.position="none")+
+#   scale_y_reverse()+
+#   coord_fixed()
+# basicgraph
 ```
 

@@ -1,13 +1,10 @@
 ---
-title: "Day XX Notebook"
+title: "Day 22 Notebook"
 output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
-library(igraph)
 library(ggplot2)
-library(rgl)
-library(ggraph)
 library(reshape2)
 library(knitr)
 library(dplyr)
@@ -19,32 +16,220 @@ options(scipen = 999)
 ```
 
 ```{r}
-input<-read_lines("DayXXSample.txt")
-#input<-read_lines("../../AoCData/AOC2018/DayXX.txt")
+#input<-read_lines("Day22Sample.txt")
+input<-read_lines("../../AoCData/AOC2019/Day22.txt")
+
+```
+
+
+```{r}
+newstack<-function(d){
+  rev(d)}
+```
+
+```{r}
+cutdeck<-function(d,n){
+  n<-n%%length(d)
+  outdeck<-d
+  outdeck<-c(d[-c(1:n)],d[c(1:n)])
+  outdeck}
+```
+
+```{r}
+cutdeck(0:9,3)
+```
+```{r}
+dwi<-function(d,n){
+  outdeck<-c()
+  for(i in 1:length(d)){
+    x<-((i-1)*n+1)%%length(d)
+    if(x==0){x<-length(d)}
+    outdeck[x]<-d[i]}
+  outdeck}
+```
+
+```{r}
+dwi(0:9,3)
+```
+```{r}
+cutdeck(dwi(dwi(0:9,7),9),-2)
+```
+```{r}
+shufflepart1<-function(d,instructions){
+  i<-1
+  while(i<=length(instructions)){
+    inst<-unlist(str_split(instructions[i]," "))
+    cat(inst,"\n")
+    if(inst[1]=="cut"){
+      d<-cutdeck(d,as.numeric(inst[2]))
+    }else if(inst[2]=="into"){
+      d<-newstack(d)
+    }else if(inst[2]=="with"){
+      d<-dwi(d,as.numeric(inst[4]))
+    }else{cat("Someting went wrong\n")}
+    i<-i+1}
+  d}
+```
+
+```{r}
+p1<-shufflepart1(0:10006,input)
+part1<-which(p1==2019)-1
+part1
+
+```
+
+## Part 2 - 
+
+Can't brute it - so
+
+
+Where do things go:
+
+
+```{r}
+aftercut<-function(decksize,stpos,n){
+  endpos<-(stpos-n)%%decksize
+  if(endpos==0){endpos<-decksize}
+  endpos}
+
+
+```
+
+
+```{r}
+aftercut(10,1,3)
+q<-sapply(1:10,function(x){aftercut(10,x,-4)})
+(0:10)[order(q)]
 
 ```
 
 ```{r}
-### Matrix
-diagnosticreport<-matrix(0,nrow=length(input),ncol=nchar(input[1]))
-for(i in 1:length(input)){diagnosticreport[i,]<-as.numeric(unlist(str_split(input[i],"")))}
+afternew<-function(decksize,stpos){
+  endpos<-decksize+1-stpos
+  endpos}
+```
+
+```{r}
+q<-sapply(1:10,function(x){afternew(10,x)})
+(0:10)[order(q)]
+
+
+```
+
+```{r}
+afterinc<-function(decksize,stpos,n){
+  endpos<-(((stpos-1)*n)+1)%%decksize
+  if(endpos==0){endpos<-decksize}
+  endpos}
+```
+
+
+
+
+
+```{r}
+q<-sapply(1:10,function(x){afterinc(10,x,3)})
+q
+```
+```{r}
+(0:10)[order(q)]
+```
+
+
+This uses the above to take in the starting card *position* (not starting card number.  Because it is 1 indexed, 2019 is at position 2020)
+```{r}
+finalcardposition<-function(decksize,instructions,stpo){
+  i<-1
+  while(i<=length(instructions)){
+    inst<-unlist(str_split(instructions[i]," "))
+    if(inst[1]=="cut"){
+      stpo<-aftercut(decksize,stpo,as.numeric(inst[2]))
+    }else if(inst[2]=="into"){
+      stpo<-afternew(decksize,stpo)
+    }else if(inst[2]=="with"){
+      stpo<-afterinc(decksize,stpo,as.numeric(inst[4]))
+    }else{cat("Someting went wrong\n")}
+    i<-i+1}
+  ### realigns to be 0 indexed
+  stpo}
+```
+
+
+###############
+Trying one more time using modular arithmetic:
+
+```{r}
+modtransform<-function(decksize,instructions){
+  a<-1
+  b<-0
+  m<-decksize
+  i<-1
+  while(i<=length(instructions)){
+    inst<-unlist(str_split(instructions[i]," "))
+    if(inst[1]=="cut"){
+      c<-1
+      d<- -as.numeric(inst[2])
+    }else if(inst[2]=="into"){
+      c<- -1
+      d<- -1
+    }else if(inst[2]=="with"){
+      c<- as.numeric(inst[4])
+      d<- 0
+    }else{cat("Someting went wrong\n")}
+    
+    a<-(a*c)%%m
+    b<-(b*c+d)%%m
+    i<-i+1}
+  ### realigns to be 0 indexed
+  c(a,b)}
 
 ```
 
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse()+
-  coord_fixed()
-basicgraph
+```{r}
+modtransform(10007,input)
 ```
 
+
+```{r}
+yr<-2019
+for(i in 1:10){
+yr<-(9390*yr+7459)%%10007
+cat(yr,"\n")}
+```
+```{r}
+
+```
+
+
+
+
+```{r}
+p2<-modtransform(119315717514047,input)
+p2
+```
+
+### find the "kth" of p2
+```{r}
+shuffles<-101741582076661
+decksize<-119315717514047
+
+tothek<-function(lcf,k,m){
+  g<-c(1,0)
+  f<-lcf
+  while(k>0){
+    if(k%%2==1){
+      g[1]<-(g[1]*f[1])%%m 
+      g[2]<-((f[1]*g[2])+f[2])%%m}
+    k<-k%/%2
+    f[1]<-(f[1]*f[1])%%m
+    f[2]<-((f[1]*f[2])+f[2])%%m}
+g}
+
+for(i in 1:10){
+  q<-tothek(c(9390,7459),i,10007)
+  a<-2019*q[1]+q[2]
+  cat(a,"\n")}
+
+
+```
