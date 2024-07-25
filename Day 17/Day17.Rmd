@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 17 Notebook"
 output: html_notebook
 ---
 
@@ -312,7 +312,8 @@ Then, run it after its set to 2
 ```{r}
 p2prg<-intcode
 p2prg[1]<-2
-p2out<-iccomp(p2prg,allmess,1,0,F)
+### instead of having doing the input after a prompt it was all front loaded. I didn't get to actual prompts until day 25.
+p2out<-iccomp(p2prg,allmess,1,0,T)
 ```
 
 The answer is 945911
@@ -321,7 +322,7 @@ The answer is 945911
 finalout<-p2out[[2]]
 ```
 
-```{r}
+```{r,echo=FALSE,eval=FALSE}
 p2asciimatrix<-matrix(ncol=nc,nrow=0)
 ln<-1
 sl<-c()
@@ -342,7 +343,7 @@ for(i in 1:length(finalout)){
     ### otherwise, append to the end of the line
   }else{sl<-c(sl,vw)}}
 ```
-```{r}
+```{r,eval=FALSE,echo=FALSE}
 sdf2<-melt(unname(p2asciimatrix))
 basicgraph<-ggplot()+
   geom_tile(data=sdf2,aes(x=Var2,y=Var1,fill=value))+

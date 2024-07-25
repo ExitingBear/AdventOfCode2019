@@ -4,6 +4,8 @@ output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
+library(gifski)
+library(gganimate)
 library(ggplot2)
 library(reshape2)
 library(knitr)
@@ -16,8 +18,7 @@ options(scipen = 999)
 ```
 
 ```{r}
-#input<-read_lines("Day3Sample.txt")
-input<-read_lines("../../AoCData/AOC2019/Day3.txt")
+input<-read_lines("Day3Sample.txt")
 
 
 ```
@@ -77,13 +78,16 @@ part1
 ## Part 2
 ```{r}
 fastestcross<-function(wire1,wire2){
+  ### for the animation
+  crossdf<-as.data.frame(matrix(ncol=4,nrow=0))
   beenthere<-dict()
   wire1<-unlist(str_split(wire1,","))
   wire2<-unlist(str_split(wire2,","))
   ### map wire 1
   w1<-c(0,0)
   t1<-1
-  beenthere$set(str_flatten(w1," "),sum(w1)) 
+  beenthere$set(str_flatten(w1," "),sum(w1))
+  crossdf<-rbind(crossdf,list("w1",0,0,0))
   for(i in 1:length(wire1)){
     direction<-str_sub(wire1[i],1,1)
     distance<-as.numeric(str_sub(wire1[i],start=2))
@@ -97,13 +101,16 @@ fastestcross<-function(wire1,wire2){
              cat("bad w1 direction\n"))
       beenthere$set(str_flatten(w1," "),t1)
       t1<-t1+1
-      d<-d+1}}
+      d<-d+1}
+    ### for the animation
+    crossdf<-rbind(crossdf,list("w1",w1[1],w1[2],t1))}
   ### set up an intersection map
   intersections<-as.data.frame(matrix(ncol=4,nrow=0))
   ### crawl through w2
   w2<-c(0,0)
   t2<-1
-  beenthere$set(paste(w2),sum(w2)) 
+  beenthere$set(paste(w2),sum(w2))
+  crossdf<-rbind(crossdf,list("w2",0,0,0))
   for(i in 1:length(wire2)){
     direction<-str_sub(wire2[i],1,1)
     distance<-as.numeric(str_sub(wire2[i],start=2))
@@ -119,7 +126,8 @@ fastestcross<-function(wire1,wire2){
         intersections<-rbind(intersections,
                              c(w2,beenthere$get(str_flatten(w2," ")),t2))}
       t2<-t2+1
-      d<-d+1}}
+      d<-d+1}
+    crossdf<-rbind(crossdf,list("w2",w2[1],w2[2],t2))}
   ###
   colnames(intersections)<-c("x","y","t1","t2")
   intersections<-intersections%>%rowwise%>%mutate(besttime=t1+t2)
@@ -132,10 +140,22 @@ part2
 ```
 
 
+```{r,echo=FALSE,eval=FALSE}
+#### change output
+day3anim<-fastestcross(input[1],input[2])
 
+### change output
+day3intersects<-fastestcross(input[1],input[2])
+day3intersects<-day3intersects%>%rowwise%>%mutate(time=max(t1,t2))%>%select(-t1)%>%select(-t2)
+colnames(day3anim)<-c("wire","x","y","time")
+w1<-day3anim%>%filter(wire=="w1")
+w2<-day3anim%>%filter(wire=="w2")
 
-```{r,echo=FALSE}
+d3a<-rbind(w1,w2)
 basicgraph<-ggplot()+
+  geom_path(data=d3a,aes(x=x,y=y,color=wire))+
+  geom_point(aes(x=0,y=0),color="#000000")+
+  geom_point(data=day3intersects,aes(x=x,y=y),color="#FF00FF")+
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         axis.text.y = element_blank(),
@@ -147,6 +167,17 @@ basicgraph<-ggplot()+
         legend.position="none")+
   scale_y_reverse()+
   coord_fixed()
+
 basicgraph
+
+
+
+d3a3<-basicgraph+transition_reveal(time)
+d3a4<-animate(d3a3,renderer = gifski_renderer(),end_pause=15)
+d3a4
+
+anim_save("day3.gif",d3a4)
 ```
+
+![day3.gif](Animation)
 

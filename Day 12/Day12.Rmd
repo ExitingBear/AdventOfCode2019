@@ -18,8 +18,7 @@ options(scipen = 999)
 
 
 ```{r}
-#input<-read_lines("Day12Sample2.txt")
-input<-read_lines("../../AoCData/AOC2019/Day12.txt")
+input<-read_lines("Day12Sample2.txt")
 ```
 
 
@@ -67,8 +66,15 @@ moonmotion<-function(ms,reps){
 ```
 
 ```{r}
-moonmotion(moons,100)
+p1<-moonmotion(moons,100)
+p1
 ```
+
+```{r}
+part1<-sum(p1$toten)
+part1
+```
+
 
 ## Part 2
 Find the cycle for each dimension separately and then find the least common multiple of the dimensions
@@ -119,9 +125,7 @@ mooncycle<-function(ms){
       if(all(zd==c(ms$posz,ms$velz))){
         cyc[3]<-r
         cat(r,"- z\n")}}
-    r<-r+1
-    if(r%%2500==0){cat(r,"-",cyc,"\n")}
-    }
+    r<-r+1}
   mLCM(cyc)}
 ```
 

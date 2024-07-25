@@ -17,23 +17,12 @@ options(scipen = 999)
 ```
 
 ```{r}
-#input<-read_lines("Day18Sample4.txt")
-input<-read_lines("../../AoCData/AOC2019/Day18.txt")
+input<-read_lines("Day18Sample4.txt")
+#input<-read_lines("../../AoCData/AOC2019/Day18.txt")
 
 ```
 
 ## Part 1
-Read the input in to a nice matrix (will read into a dictionary inside the function)
-
-```{r}
-#vaultmap<-matrix(nrow=0,ncol=nchar(input[1]))
-#for(i in 1:length(input)){
-#  x<-unlist(str_split(input[i],""))
-#  vaultmap<-rbind(vaultmap,x)}
-#strt<-which(vaultmap=="@",arr.ind=TRUE)
-#strt
-```
-
 
 Because of my problems with global dictionaries - I'm reading it straight in in the function.
 
@@ -254,9 +243,8 @@ mrkfinder<-function(input){
   for(i in 1:(length(keysx)-1)){
     for(j in (i+1):length(keysx)){
       md<-abs(keysx[i]-keysx[j])+abs(keysy[i]-keysy[j])
-      if(md<minmd){cat(md,i,j," - ")
+      if(md<minmd){
         minmd<-md}}}
-  cat(minmd,"\n")
   allkeys<-sort(allkeys)
   nk<-length(allkeys)
   finished<-Inf
@@ -279,7 +267,6 @@ mrkfinder<-function(input){
     nkl<-length(keysleft)
     ### get some data
     if(nkl<keysunfound){
-      cat("keys left: ",nkl," round: ",roundcount," steps: ",currs," queue: ",pq$size()," keys: ", currk,"\n")
       keysunfound<-nkl}
     ### if all of the keys are in currk - we've won!stop
     if(all(allkeys%in%currk)){
@@ -314,8 +301,6 @@ mrkfinder<-function(input){
     
     roundcount<-roundcount+1
     }
-  cat("not done - ")
-  cat("order: ",currk," steps: ",currs,"\n")
   return(currs)}
 
 
@@ -323,9 +308,7 @@ mrkfinder<-function(input){
 
 
 ```{r}
-#input<-read_lines("Day18Sample8.txt")
-input<-read_lines("../../AoCData/AOC2019/Day18Part2.txt")
-
+input<-read_lines("Day18Sample8.txt")
 ```
 
 
@@ -333,21 +316,3 @@ input<-read_lines("../../AoCData/AOC2019/Day18Part2.txt")
 ```{r}
 mrkfinder(input)
 ```
-
-
-```{r,echo=FALSE}
-# basicgraph<-ggplot()+
-#   theme(axis.text.x = element_blank(),
-#         axis.ticks.x = element_blank(),
-#         axis.text.y = element_blank(),
-#         axis.ticks.y = element_blank(),
-#         axis.title.y = element_blank(),
-#         axis.title.x = element_blank(),
-#         panel.grid.major = element_blank(),
-#         panel.grid.minor = element_blank(),
-#         legend.position="none")+
-#   scale_y_reverse()+
-#   coord_fixed()
-# basicgraph
-```
-

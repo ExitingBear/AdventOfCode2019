@@ -152,7 +152,6 @@ iccomp<-function(prg,inp,starthere,relativebase,quiet){
            {cat(i,": unknown opcode",opcode,"\n")
              break})
     prg<-replace(prg,is.na(prg),0)}
-  #  cat("ENDING i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")
   return(list(prg,outp,0,relativebase))}
 ```
 
@@ -279,6 +278,7 @@ p1<-findOS(intcode)
 part1<-p1[[1]]
 part1
 ```
+![Searching](Day15Part1.gif)
 ## Part 2
 
 Start by looking at the full map of the area - mapping out everything just in case worked wonders
@@ -296,7 +296,7 @@ colnames(oxygraph)<-c("x","y","oxys","minutes")
 ```
 
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,eval=FALSE}
 tlvls<-c("0"="#000088","1"="#FFFFFF","2"="#FF00FF")
 ogrstatic<-ggplot()+
   geom_tile(data=oxygraph,aes(x=x,y=y,fill=oxys))+
@@ -395,4 +395,4 @@ anim_save("Day15Part1.gif",findoxanim)
 anim_save("Day15Part2.gif",findoxanim2)
 
 ```
-
+![Finding](Day15Part2.gif)

@@ -4,6 +4,8 @@ output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
+library(gganimate)
+library(gifski)
 library(ggplot2)
 library(ggraph)
 library(reshape2)
@@ -176,7 +178,7 @@ colnames(arcade)<-c("x","y","tid")
 part1<-arcade%>%count(tid)
 part1
 ```
-As tid 2 is a block tile - 
+As tid 2 is a block tile - 273
 
 
 
@@ -218,10 +220,13 @@ playgame<-function(prg){
   rb<-0
   ### because the computer overwrites old values, it's easier to just make this a dictionary (and overwrite) than to 
   currentboard<-dict()
+  ### for the animation
+  allanim<-c()
   while(keepgoing &&  si!=0 ){
     runit<-iccomp(prg,joystick,si,rb,T)
     ### update the board - get updated output
     updater<-runit[[2]]
+    allanim<-c(allanim,runit[[2]])
     for(i in seq(from=1,to=length(updater),by=3)){
       ### update ball, paddle, and score
       if(updater[i+2]==4){ball<-updater[i]}
@@ -238,32 +243,18 @@ playgame<-function(prg){
     }else if(ball==paddle){joystick<-0
     }else{(cat("I don't know what to do\n"))
       break}
-    cat("Blocks: ",blockcount," paddle: ",paddle," ball: ",ball, " Joystick: ",joystick," score: ",tail(score,1),"\n")
+    # cat("Blocks: ",blockcount," paddle: ",paddle," ball: ",ball, " Joystick: ",joystick," score: ",tail(score,1),"\n")
     ### update the prg,rb,and starting instruction
     prg<-runit[[1]]
     si<-runit[[3]]
     rb<-runit[[4]]
     }
 #### return all the scores
-score}
+allanim}
 ```
 
 ```{r}
 p2<-playgame(intcode)
-p2
+part2<-tail(p2,1)
+part2
 ```
-
-```{r}
-quarters<-intcode
-quarters[1]<-2
-```
-
-```{r}
-xxx<-iccomp(quarters,-1,1,0,T)
-```
-
-```{r}
-try1<-as.data.frame(matrix(xxx[[2]],ncol=3,byrow=T))
-colnames(try1)<-c("x","y","tid")
-```
-

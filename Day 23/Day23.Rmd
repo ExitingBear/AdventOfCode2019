@@ -1,13 +1,9 @@
 ---
-title: "Day XX Notebook"
+title: "Day 23 Notebook"
 output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(reshape2)
 library(knitr)
 library(dplyr)
@@ -18,33 +14,259 @@ library(collections)
 options(scipen = 999)
 ```
 
-```{r}
-input<-read_lines("DayXXSample.txt")
-#input<-read_lines("../../AoCData/AOC2018/DayXX.txt")
+## The Intcode
 
+```{r}
+iccomp<-function(prg,inp,starthere,relativebase,quiet){
+  i<-starthere
+  outp<-c()
+  while(prg[i]!=99){
+    ## make sure that at least the next three numbers exist
+    if((i+3)>length(prg)){
+      prg<-c(prg,
+             rep(0,(i+3-length(prg))))}
+    opcode<-as.character(prg[i]%%100)
+    firstp<-(prg[i]%/%100)%%10
+    secondp<-(prg[i]%/%1000)%%10
+    thirdp<-prg[i]%/%10000
+    #   if(quiet==F){cat("i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")}
+    switch(opcode,
+           ### add
+           "1"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a+b
+             i<-i+4},
+           ### multiply
+           "2"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a*b
+             i<-i+4},
+           ### input
+           "3"={
+             if(firstp==0){a<-prg[i+1]}
+             if(firstp==2){a<-prg[i+1]+relativebase}
+             if(is.na(a)){a<-0}
+             if(length(inp)==0){
+               if(quiet==F){cat("waiting---\n")}
+               return(list(prg,outp,i,relativebase))
+             }else{
+               if(quiet==F){cat("input: ",inp[1]," - ")}
+               prg[a+1]<-inp[1]
+               inp<-inp[-1]
+               i<-i+2}},
+           ### output
+           "4"={
+             a<-prg[i+1]
+             if(firstp==0){
+               # if(quiet==F){cat("looking here: ",a+1,"\n")}
+               a<-prg[a+1]}
+             if(firstp==2){
+               #   if(quiet==F){cat("looking here: ",a+1+relativebase,"\n")}
+               a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(quiet==F){cat("output: ",a,"\n")}
+             outp<-c(outp,a)
+             i<-i+2},
+           ### jump if true
+           "5"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a!=0){i<-b+1}else{i<-i+3}},
+           ### jump if false
+           "6"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a==0){i<-b+1}else{i<-i+3}},
+           ### less than
+           "7"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a<b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "8"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a==b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "9"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             relativebase<-relativebase+a
+             i<-i+2},
+           {cat(i,": unknown opcode",opcode,"\n")
+             break})
+    prg<-replace(prg,is.na(prg),0)}
+  #  cat("ENDING i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")
+  return(list(prg,outp,0,relativebase))}
+```
+
+
+```{r}
+input<-read_lines("../../AoCData/AOC2019/Day23.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
+```
+
+
+
+ For part 1 - keep every program in separate.  Run them all asynchronously.
+```{r}
+ntwrk<-function(prg){
+  ### create the following:
+  ### programs for each computer
+  comprog<-rep(list(prg),50)
+  ### starting inst
+  si<-c()
+  ### relative base
+  rb<-c()
+  ### initialize - I checked these.  I know there aren't any outputs during the initialization phase
+  for(i in 1:50){
+    x<-iccomp(intcode,i-1,1,0,T)
+    comprog[[i]]<-x[[1]]
+    si[i]<-x[[3]]
+    rb[i]<-x[[4]]}
+  ### run each computer semi-asynchronously
+  pckts<-vector(mode="list",length=256)
+  roundcount<-1
+  while(is.null(pckts[[256]])){
+    ### run each computer
+    for(i in 1:50){
+      ### if there are no waiting packets, input -1
+      if(is.null(pckts[[i]])){
+        x<-iccomp(comprog[[i]],-1,si[i],rb[i],T)
+      }else{
+        ### otherwise, if there are waiting packets,
+        x<-iccomp(comprog[[i]],c(pckts[[i]]),si[i],rb[i],T)
+        pckts[[i]]<-pckts[[i]][-c(1:length(pckts[[i]]))]}
+      ###update the computer
+      comprog[[i]]<-x[[1]]
+      si[i]<-x[[3]]
+      rb[i]<-x[[4]]
+      if(!is.null(x[[2]])){
+        ps<-x[[2]]
+        for(j in seq(from=1,to=length(ps),by=3)){
+          pckts[[ps[j]+1]]<-c(pckts[[ps[j]+1]],ps[j+1],ps[j+2])}}}
+  #  cat(roundcount,paste(pckts[1:50]),"\n")
+  #  cat(roundcount,paste(pckts[256]),"\n")
+    roundcount<-roundcount+1}
+pckts}
 ```
 
 ```{r}
-### Matrix
-diagnosticreport<-matrix(0,nrow=length(input),ncol=nchar(input[1]))
-for(i in 1:length(input)){diagnosticreport[i,]<-as.numeric(unlist(str_split(input[i],"")))}
+p1<-ntwrk(intcode)
+```
 
+```{r}
+part1<-p1[[256]][2]
+part1
+```
+## Part 2
+
+For part 2
+
+```{r}
+natnet<-function(prg){
+  ### create the following:
+  ### programs for each computer
+  comprog<-rep(list(prg),50)
+  ### starting inst
+  si<-c()
+  ### relative base
+  rb<-c()
+  ### need a number to be able to compare
+  lasty<-Inf
+  ### initialize - I checked these.  I know there aren't any outputs during the initialization phase
+  for(i in 1:50){
+    x<-iccomp(intcode,i-1,1,0,T)
+    comprog[[i]]<-x[[1]]
+    si[i]<-x[[3]]
+    rb[i]<-x[[4]]}
+  ### run each computer semi-asynchronously
+  pckts<-vector(mode="list",length=256)
+  keepgoing<-TRUE
+  nat<-c()
+  while(keepgoing){
+    ### run each computer
+    for(i in 1:50){
+      ### if there are no waiting packets, input -1
+      if(is.null(pckts[[i]])){
+        x<-iccomp(comprog[[i]],-1,si[i],rb[i],T)
+      }else{
+        ### otherwise, if there are waiting packets,
+        x<-iccomp(comprog[[i]],c(pckts[[i]]),si[i],rb[i],T)
+        pckts[[i]]<-pckts[[i]][-c(1:length(pckts[[i]]))]}
+      ###update the computer
+      comprog[[i]]<-x[[1]]
+      si[i]<-x[[3]]
+      rb[i]<-x[[4]]
+      if(!is.null(x[[2]])){
+        ps<-x[[2]]
+        ### run through all outputs (in case more than one)
+        for(j in seq(from=1,to=length(ps),by=3)){
+        ### update the NAT if needed
+          if(ps[j]==255){
+            nat<-c(ps[j+1],ps[j+2])
+          }else{pckts[[ps[j]+1]]<-c(pckts[[ps[j]+1]],ps[j+1],ps[j+2])}}}}
+    ### after all computers are run, check to see if there is anything not idle 
+    if(all(sapply(pckts[1:50],length)==0)){
+      ### check to see the last delivered
+      if(lasty==nat[2]){return(lasty)
+        }else{
+          lasty<-nat[2]
+          pckts[[1]]<-nat}}}
+lasty}
 ```
 
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse()+
-  coord_fixed()
-basicgraph
+```{r}
+p2<-natnet(intcode)
+p2
 ```
 

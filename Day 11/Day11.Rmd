@@ -160,7 +160,6 @@ iccomp<-function(prg,inp,starthere,relativebase,quiet){
 
 
 ```{r}
-#input<-read_lines("Day11Sample.txt")
 input<-read_lines("../../AoCData/AOC2019/Day11.txt")
 intcode<-as.numeric(unlist(str_split(input,",")))
 ```
@@ -230,7 +229,6 @@ part1
 
 ```{r}
 p2<-painthull(intcode,1)
-
 p2frame<-as.data.frame(t(rbind(unlist(p2$keys()),unlist(p2$values()))))
 p2frame<-p2frame%>%rowwise%>%
   mutate(x=str_split_i(V1," ",1),y=str_split_i(V1," ",2))%>%
