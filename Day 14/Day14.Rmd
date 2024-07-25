@@ -17,14 +17,14 @@ options(scipen = 999)
 ```
 
 ```{r}
-#input<-read_lines("Day14Sample5.txt")
-input<-read_lines("../../AoCData/AOC2019/Day14.txt")
+input<-read_lines("Day14Sample5.txt")
+
 ```
 
 ## Part 1
 This is recursive.
 
-I think I'm going to do an unholy combination of a about 6 different things... I am building a map so that I can roll up by "distance to ore" & a transform list.  Also, I hate this solution - it's way too scattered
+I think I'm going to do an unholy combination of a about 6 different things... I am building a map so that I can roll up by "distance to ore" & a transform list.
 ```{r}
 
 rmatrix<-matrix(ncol=4,nrow=0)
@@ -98,7 +98,7 @@ breakdown<-function(x,rmat){
 ```{r}
 howmuchore<-function(rmat,rtab){
   ### create the starting single fuel
-  ### (see maybe up above)
+  ###
   inglist<-as.data.frame((matrix(c(component="FUEL",cnt=1),ncol=2,byrow=T)))
   colnames(inglist)<-c("component","cnt")
   inglist$cnt<-as.numeric(inglist$cnt)

@@ -4,7 +4,8 @@ output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
-library(ggplot2)
+library(bit64)
+library(numbers)
 library(reshape2)
 library(knitr)
 library(dplyr)
@@ -16,9 +17,7 @@ options(scipen = 999)
 ```
 
 ```{r}
-#input<-read_lines("Day22Sample.txt")
 input<-read_lines("../../AoCData/AOC2019/Day22.txt")
-
 ```
 
 
@@ -59,7 +58,7 @@ shufflepart1<-function(d,instructions){
   i<-1
   while(i<=length(instructions)){
     inst<-unlist(str_split(instructions[i]," "))
-    cat(inst,"\n")
+   # cat(inst,"\n")
     if(inst[1]=="cut"){
       d<-cutdeck(d,as.numeric(inst[2]))
     }else if(inst[2]=="into"){
@@ -77,6 +76,18 @@ part1<-which(p1==2019)-1
 part1
 
 ```
+
+```{r}
+p1<-0:10006
+x<-2019
+for(i in 1:10){
+  p1<-shufflepart1(p1,input)
+  x<-which(p1==2019)-1
+  cat(x,"\n")
+}
+```
+
+
 
 ## Part 2 - 
 
@@ -176,7 +187,6 @@ modtransform<-function(decksize,instructions){
       c<- as.numeric(inst[4])
       d<- 0
     }else{cat("Someting went wrong\n")}
-    
     a<-(a*c)%%m
     b<-(b*c+d)%%m
     i<-i+1}
@@ -197,39 +207,212 @@ for(i in 1:10){
 yr<-(9390*yr+7459)%%10007
 cat(yr,"\n")}
 ```
-```{r}
 
+```{r}
+cmps<-function(a,b,c,d,m){
+  a<-(a*c)%%m
+  b<-((b*c)+d)%%m
+  c(a,b)}
 ```
 
-
-
-
 ```{r}
-p2<-modtransform(119315717514047,input)
-p2
-```
-
-### find the "kth" of p2
-```{r}
-shuffles<-101741582076661
-decksize<-119315717514047
-
-tothek<-function(lcf,k,m){
-  g<-c(1,0)
-  f<-lcf
+ebs<-function(a,b,k,decksize,t){
+  c<-1
+  d<-0
   while(k>0){
     if(k%%2==1){
-      g[1]<-(g[1]*f[1])%%m 
-      g[2]<-((f[1]*g[2])+f[2])%%m}
+      g<-cmps(a,b,c,d,decksize)
+      c<-g[1]
+      d<-g[2]}
     k<-k%/%2
-    f[1]<-(f[1]*f[1])%%m
-    f[2]<-((f[1]*f[2])+f[2])%%m}
-g}
+  f<-cmps(a,b,a,b,decksize)
+  a<-f[1]
+  b<-f[2]}
+  
+  cat(((c*t)+d)%%decksize,"\n")
+  #c(c,d)
+  
+  (c*t+d)%%decksize}
 
+```
+
+
+
+```{r}
+ebs(9390,7459,1,10007,2019)
+
+q<-2019
 for(i in 1:10){
-  q<-tothek(c(9390,7459),i,10007)
-  a<-2019*q[1]+q[2]
-  cat(a,"\n")}
+  q<-ebs(9390,7459,i,10007,2019)
+  cat(q,"\n")
+}
+
 
 
 ```
+
+```{r}
+bigdeck<-(119315717514047)
+bigshuffle<-(101741582076661)
+
+```
+
+
+
+
+```{r}
+AB<-modtransform(bigdeck,input)
+
+### This is the transform of it once.
+
+bigA<-AB[1]
+bigB<-AB[2]
+
+```
+
+```{r}
+
+ebs(bigA,bigB,bigshuffle,bigdeck,1)
+
+### So this - 
+```
+
+```{r}
+### 54484076068864 58680795987968
+```
+
+
+SO - I think
+
+2020=54484076068864 *x+58680795987968 (mod 119315717514047)
+2020-58680795987968=54484076068864 *x (mod 119315717514047)
+
+find the modular multiplicative inverse
+
+```{r}
+modinv(54484076068864,119315717514047)
+```
+(2020-86304683458560)\*420286289049=55474871336960\*420286289049\*x
+
+
+Which is  81151119716072
+
+
+```{r}
+((2020-86304683458560)*420286289049)%%119315717514047
+
+```
+x = 81947887346318
+
+WHICH IS STILL FUCKING WRONG and technically more wrong than it was.
+
+
+
+----------------------------
+
+```{r}
+inverstrans<-function(decksize,instructions){
+  a<-1
+  b<-0
+  m<-decksize
+  i<-1
+  while(i<=length(instructions)){
+    inst<-unlist(str_split(instructions[i]," "))
+    if(inst[1]=="cut"){
+      c<-1
+      d<- -as.numeric(inst[2])
+    }else if(inst[2]=="into"){
+      c<- -1
+      d<- -1
+    }else if(inst[2]=="with"){
+      c<- as.numeric(inst[4])
+      d<- 0
+    }else{cat("Someting went wrong\n")}
+    ### invert it
+    invc<-modinv(c,m)%%m
+    invd<- (-d*modinv(c,m))%%m
+    ###
+    a<-(a*invc)%%m
+    b<-(b*invc+invd)%%m
+    i<-i+1}
+  ### realigns to be 0 indexed
+  c(a,b)}
+```
+
+
+
+```{r}
+inverstrans(119315717514047,rev(input))
+
+### 1 transform
+
+```
+```{r}
+ebs(43018258219008,33143725761322,bigshuffle,10007,2020)
+```
+
+
+```{r}
+inverstrans(10007,rev(input))
+
+### 1 transform
+
+```
+
+
+
+
+
+```{r}
+ebs(54484076068864,58680795987968,bigshuffle,bigdeck,1)
+```
+```{r}
+a<-sample(1:10007,20)
+
+b<-sapply(a,function(x){
+  ebs(9390,7459,x,10007,2019)
+})
+b
+
+lll<-sapply(1:20,function(x){
+  ebs(519,1488,a[x],10007,b[x])
+})
+lll
+```
+
+
+
+```{r}
+largedeck<-as.integer64(119315717514047)
+largeshuffle<-as.integer64(101741582076661)
+```
+
+
+```{r}
+a<-sample(1:5000,20)
+```
+
+
+
+```{r}
+inverstrans(119315717514047,rev(input))
+
+### 1 transform
+
+```
+
+
+
+```{r}
+b<-sapply(a,function(x){
+  ebs(54484076068864,58680795987968,x,119315717514047,2019)
+})
+b
+
+lll<-sapply(1:20,function(x){
+  ebs(43018258219008,33143725761322,a[x],119315717514047,b[x])
+})
+lll
+```
+
+

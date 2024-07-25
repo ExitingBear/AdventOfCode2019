@@ -4,6 +4,7 @@ output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
+library(combinat)
 library(reshape2)
 library(knitr)
 library(dplyr)
@@ -62,10 +63,10 @@ iccomp<-function(prg,inp,starthere){
            "3"={
              a<-prg[i+1]
              if(length(inp)==0){
-               cat("waiting---\n")
+             #  cat("waiting---\n")
                return(list(prg,outp,i))
              }else{
-               cat("input: ",inp[1]," - ")
+           #    cat("input: ",inp[1]," - ")
              prg[a+1]<-inp[1]
              inp<-inp[-1]
              i<-i+2}},
@@ -74,7 +75,7 @@ iccomp<-function(prg,inp,starthere){
              a<-prg[i+1]
              if(firstp==0){
                a<-prg[a+1]}
-             cat("output: ",a," - ")
+             #cat("output: ",a," - ")
              ## day 7 only
              if(a>outp){
                outp<-a}else
@@ -121,38 +122,43 @@ iccomp<-function(prg,inp,starthere){
 
 ```{r}
 thrustersignal<-function(prg,pss,secondinput){
+  ### start with the phase setting as a number
   pss<-as.numeric(unlist(str_split(pss,"")))
   ### in case the starting sequence is less than 10000
   pss<-c(rep(0,5-length(pss)),pss)
-  cat(pss,"\n")
   i<-1
   while(i<=length(pss)){
     phasesetting<-pss[i]
+    ### run the phase setting through the intcode computer
     amplify<-iccomp(prg,c(phasesetting,secondinput),1)
+    ### get the updated program
     prg<-amplify[[1]]
+    ### get the actual output
     secondinput<-amplify[[2]]
    # cat(secondinput,"\n")
     i<-i+1}
+  ### return the output
 secondinput}
 ```
 
 ```{r}
-thrustersignal(c(3,23,3,24,1002,24,10,24,1002,23,-1,23,
-101,5,23,23,1,24,23,23,4,23,99,0,0),01234,0)
+thrustersignal(c(3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0),01234,0)
 ```
+For the output, find all permutations and try each one
 
 ```{r}
-maxts<-function(prg,psvector,secondinput){  
+maxts<-function(prg,psvector,secondinput){
+  ### get all permutations
   allperms<-permn(psvector)
+  ### try each
   allperms<-sapply(allperms,str_flatten)
   mts<-0
   for(i in 1:length(allperms)){
     ts<-thrustersignal(prg,allperms[i],0)
     if(ts>mts){
       mts<-ts
-      longest<-allperms[i]}
-    cat("****\n")}
-  cat(longest,"\n")
+      longest<-allperms[i]}}
+  ### find and return the longest/highest
   mts}
   
 ```
@@ -164,19 +170,22 @@ maxts(intcode,c(0,1,2,3,4),0)
 ## Part 2
 
 
+Someday, I'll learn to comment things *as* I do them. 
 
+Much as above, this takes a single input and runs it all the way through the feedback loop
 
 ```{r}
 feedbacksignal<-function(prg,pss,inp){
   pss<-as.numeric(unlist(str_split(pss,"")))
   ### in case the starting sequence is less than 10000
   pss<-c(rep(0,5-length(pss)),pss)
-  cat(pss,"\n")
   strtinst<-rep(1,5)
   mchnprg<-list(prg,prg,prg,prg,prg)
   mchn<-1
   runthrough<-1
   keepgoing<-1
+  
+  ### run through the feedback loop
   while(keepgoing){
     while(mchn<=length(pss)){
       if(strtinst[mchn]!=0){
@@ -187,12 +196,10 @@ feedbacksignal<-function(prg,pss,inp){
       inp<-amplify[[2]]
       strtinst[mchn]<-amplify[[3]]
       mchn<-mchn+1}else{
-        cat(mchn,"done\n")
       mchn<-mchn+1}
       }
     if(all(strtinst==0)){keepgoing=FALSE
     break}
-    cat(runthrough," ******\n")
     runthrough<-runthrough+1
     mchn<-1
     }
@@ -211,13 +218,10 @@ maxfs<-function(prg,psvector,secondinput){
   allperms<-sapply(allperms,str_flatten)
   mfs<-0
   for(i in 1:length(allperms)){
-    cat(allperms[i],"\n")
     fs<-feedbacksignal(prg,allperms[i],0)
     if(fs>mfs){
       mfs<-fs
-      longest<-allperms[i]}
-    cat("\n",i,"  ************************\n")}
-  cat(longest,"\n")
+      longest<-allperms[i]}}
   mfs}
   
 ```

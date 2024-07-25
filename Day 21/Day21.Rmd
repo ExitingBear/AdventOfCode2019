@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 21 Notebook"
 output: html_notebook
 ---
 
@@ -202,7 +202,7 @@ x<- c(inst2ascii("OR A T"),
 
 
 ```{r}
-try<-iccomp(intcode,x,1,0,F)
+try<-iccomp(intcode,x,1,0,T)
 ```
 
 ```{r}
@@ -211,7 +211,6 @@ whathappened<-try[[2]]
 
 ```{r}
 tail(try[[2]],1)
-cat(ascii2inst((whathappened[-length(whathappened)])))
 ```
 ## Part 2
 
@@ -231,7 +230,7 @@ x<- c(inst2ascii("OR A T"),
 
 
 ```{r}
-try<-iccomp(intcode,x,1,0,F)
+try<-iccomp(intcode,x,1,0,T)
 ```
 
 
@@ -277,28 +276,8 @@ x<- c(inst2ascii("OR A T"),
 try<-iccomp(intcode,x,1,0,F)
 
 ```{r}
-try<-iccomp(intcode,x,1,0,F)
-whathappened<-try[[2]]
-cat(ascii2inst(whathappened))
-```
-
-
-
-
-
-```{r,echo=FALSE}
-# basicgraph<-ggplot()+
-#   theme(axis.text.x = element_blank(),
-#         axis.ticks.x = element_blank(),
-#         axis.text.y = element_blank(),
-#         axis.ticks.y = element_blank(),
-#         axis.title.y = element_blank(),
-#         axis.title.x = element_blank(),
-#         panel.grid.major = element_blank(),
-#         panel.grid.minor = element_blank(),
-#         legend.position="none")+
-#   scale_y_reverse()+
-#   coord_fixed()
-# basicgraph
+try<-iccomp(intcode,x,1,0,T)
+part2<-tail(try[[2]],1)
+part2
 ```
 

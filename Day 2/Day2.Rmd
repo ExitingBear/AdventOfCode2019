@@ -21,21 +21,10 @@ intcode<-as.numeric(unlist(str_split(input,",")))
 
 ```
 
-I have to admit - I've slightly read ahead here so I know where this is heading (loosely).  To start, create the opcodes. For the time being, I'm leaving this as a 
+## intcode
 
-
-```{r}
-### remember, offset 1
-op01<-function(a,b){
-  output<-a+b
-output}
-
-### opcode 2 multiplies
-op02<-function(a,b,prg){
-  output<-a*b
-output}
-```
-
+This is the first version of the intcode which will change and adapt over time.
+Because r indices start at 1, there's a lot of futzing to get things correct.
 ```{r}
 iccomp<-function(prg){
   i<-1
@@ -59,6 +48,9 @@ iccomp<-function(prg){
 ```
 
 ```{r}
+iccomp(c(1,0,0,0,99))
+iccomp(c(2,3,0,3,99))
+iccomp(c(2,4,4,5,99,0))
 iccomp(c(1,1,1,4,99,5,6,0,99))
 ```
 
@@ -69,7 +61,6 @@ p1[2]<-12
 ### replace position 2 with 2
 p1[3]<-2
 part1<-iccomp(p1)
-part1
 part1[1]
 
 ```
@@ -96,7 +87,7 @@ findnounverb<-function(prg,target){
     a<-iccomp(a)[1]
     a})
   verb<-max(which(verb==target))-1
-  cat(" verb: ",verb)
+  cat(" verb: ",verb,"\n")
 100*noun+verb}
 ```
 

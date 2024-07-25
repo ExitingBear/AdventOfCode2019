@@ -16,15 +16,10 @@ options(scipen = 999)
 ```
 
 ```{r}
-#input<-read_lines("Day20Sample3.txt")
-input<-read_lines("../../AoCData/AOC2019/Day20.txt")
+input<-read_lines("Day20Sample3.txt")
 
 ```
 
-
-```{r}
-input[20]
-```
 
 
 ## Part 1
@@ -186,14 +181,12 @@ twentydonut<-function(inp){
     curry<-curr[2]
     currl<-curr[3]
     if(currl>maxlevel){
-      cat(curr,"\n")
       maxlevel<-currl
     }
     currs<-curr[4]
     ### if done, stop
     if(currx==ZZ[1]&&curry==ZZ[2]&&currl==0){
       ### to account for adding 2 when going to ZZ
-      cat(roundcount,"-",curr,"\n")
       return(currs)
       break}
     ### if you're on a negative level, stop
@@ -276,16 +269,8 @@ part2
 
 
 
+In putting together part 2, this is a better part 1
 
-
-
-
-
-
-
-
-
-BETTER SINGLE LAYER
 
 ```{r}
 twentydonut<-function(inp){
@@ -326,9 +311,7 @@ twentydonut<-function(inp){
   ### q <- x,y,steps
   pq$push(c(AA[1],AA[2],0),0)
   extlist<-unlist(externals$keys())
-  cat(extlist,"\n")
   intlist<-unlist(internals$keys())
-  cat(intlist,"\n")
   portallist<-c(extlist,intlist)
   while(pq$size()>0){
     curr<-pq$pop()

@@ -1,0 +1,353 @@
+---
+title: "Day 18 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(memoise)
+library(ggplot2)
+library(reshape2)
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+```{r}
+#input<-read_lines("Day18Sample4.txt")
+input<-read_lines("../../AoCData/AOC2019/Day18.txt")
+
+```
+
+## Part 1
+Read the input in to a nice matrix (will read into a dictionary inside the function)
+
+```{r}
+#vaultmap<-matrix(nrow=0,ncol=nchar(input[1]))
+#for(i in 1:length(input)){
+#  x<-unlist(str_split(input[i],""))
+#  vaultmap<-rbind(vaultmap,x)}
+#strt<-which(vaultmap=="@",arr.ind=TRUE)
+#strt
+```
+
+
+Because of my problems with global dictionaries - I'm reading it straight in in the function.
+
+```{r}
+keyfinder<-function(instr){
+  ### read the vault map into the dictionary and find the start space
+  vaultmap<-dict()
+  allkeys<-c()
+  maxy<-length(instr)
+  maxx<-nchar(instr[1])
+  for(i in 1:maxy){
+    a<-instr[i]
+    for(j in 1:maxx){
+      y<-str_sub(a,j,j)
+      b<-str_flatten(c(j,i)," ")
+      vaultmap$set(b,y)
+      if(y=="@"){entrance<-c(j,i)
+      vaultmap$set(b,".")
+      }
+      if(y %in% letters){allkeys<-c(allkeys,y)}
+    }}
+  allkeys<-sort(allkeys)
+  nk<-length(allkeys)
+  finished<-Inf
+  ### 
+  beenthere<-dict()
+  ### priority is number of steps + the number of keys left
+  pq<-priority_queue()
+  ### pushing x,y,list of keys, number of steps
+  startpush<-list(entrance[1],entrance[2],c(),0)
+  pq$push(startpush,-nk)
+  
+  while(pq$size()>0){
+    curr<-pq$pop()
+    currx<-curr[[1]]
+    curry<-curr[[2]]
+    currk<-curr[[3]]
+    currs<-curr[[4]]
+#    cat(currx,curry,":",currk,"\n")
+    ### if you have all the keys, report to "finished"
+    if(length(currk)==nk){
+      if(currs<finished){finished<-currs
+      cat("keys: ",currk," steps: ",currs,"\n")}
+      break}
+    ### if have been here before, get out - check by sorting the keys.
+    bt<-str_flatten(c(currx,curry,sort(currk))," ")
+    if(beenthere$has(bt)){next}
+    beenthere$set(bt,currs)
+    ### otherwise, push up, down, left, right
+    ### up
+    if(curry>1){
+      u<-vaultmap$get(str_flatten(c(currx,curry-1)," "))
+      ### if it's a path go there
+      if(u=="."){
+        pq$push(list(currx,curry-1,currk,currs+1),-currs-1-nk+length(currk))
+        ### if it's a key, add it to list of keys
+      }else if(u%in%letters){
+        uk<-unique((c(currk,u)))
+        pq$push(list(currx,curry-1,uk,currs+1),-currs-1-nk+length(uk))
+        ### if u is a lock & we have the keys, move
+      }else if(u%in%LETTERS&tolower(u)%in%currk){
+        pq$push(list(currx,curry-1,currk,currs+1),-currs-1-nk+length(currk))}}
+    ### down
+    if(curry<maxy){
+      d<-vaultmap$get(str_flatten(c(currx,curry+1)," "))
+      ### if it's a path go there
+      if(d=="."){
+        pq$push(list(currx,curry+1,currk,currs+1),-currs-1-nk+length(currk))
+        ### if it's a key, add it to list of keys
+      }else if(d%in%letters){
+        dk<-unique((c(currk,d)))
+        pq$push(list(currx,curry+1,dk,currs+1),-currs-1-nk+length(dk))
+        ### if u is a lock & we have the keys, move
+      }else if(d%in%LETTERS&tolower(d)%in%currk){
+        pq$push(list(currx,curry+1,currk,currs+1),-currs-1-nk+length(currk))}}
+    ### left
+    if(currx>1){
+      l<-vaultmap$get(str_flatten(c(currx-1,curry)," "))
+      ### if it's a path go there
+      if(l=="."){
+        pq$push(list(currx-1,curry,currk,currs+1),-currs-1-nk+length(currk))
+        ### if it's a key, add it to list of keys
+      }else if(l%in%letters){
+        lk<-unique((c(currk,l)))
+        pq$push(list(currx-1,curry,lk,currs+1),-currs-1-nk+length(lk))
+        ### if it is a lock & we have the keys, move
+      }else if(l%in%LETTERS&tolower(l)%in%currk){
+        pq$push(list(currx-1,curry,currk,currs+1),-currs-1-nk+length(currk))}}
+    if(currx<maxx){
+      r<-vaultmap$get(str_flatten(c(currx+1,curry)," "))
+      ### if it's a path go there
+      if(r=="."){
+        pq$push(list(currx+1,curry,currk,currs+1),-currs-1-nk+length(currk))
+        ### if it's a key, add it to list of keys
+      }else if(r%in%letters){
+        rk<-unique((c(currk,r)))
+        pq$push(list(currx+1,curry,rk,currs+1),-currs-1-nk+length(rk))
+        ### if it is a lock & we have the keys, move
+      }else if(r%in%LETTERS&tolower(r)%in%currk){
+        pq$push(list(currx+1,curry,currk,currs+1),-currs-1-nk+length(currk))}}    
+    }
+  ### end while
+finished}
+
+
+```
+
+```{r}
+keyfinder(input)
+```
+
+## Part 2
+
+
+
+takes starting coordinates, a map, found keys, and a target and gets the number of steps
+```{r}
+quickstep<-function(x,y,vmp,kys,maxx,maxy,target,lmp){
+  beenthere<-dict()
+  finished<-Inf
+  pq<-priority_queue()
+  ### push is x,y,val,steps
+  startpush<-list(x,y,vmp$get(str_flatten(c(x,y)," ")),0)
+  pq$push(startpush,0)
+  nk<-length(kys)
+  tc<-lmp$get(target)
+  while(pq$size()>0){
+    curr<-pq$pop()
+    currx<-curr[[1]]
+    curry<-curr[[2]]
+    currv<-curr[[3]]
+    currs<-curr[[4]]
+    currc<-c(currx,curry)
+   # cat(currx,curry,currv,currs,"\n")
+    if(curr[[3]]==target){
+    #  cat(target,":",currs,"\n")
+      return(list(target,currs,tc[1],tc[2]))
+      break}
+    bt<-str_flatten(c(currx,curry)," ")
+    if(beenthere$has(bt)){next}
+    beenthere$set(bt,currs)
+    ### otherwise, push up, down, left, right
+    ### up 
+    if(curry>1){
+      u<-vmp$get(str_flatten(c(currx,curry-1)," "))
+      umd<-sum(abs(currc+c(0,-1)-tc))
+      ### if it's a path go there or if it's the target
+      ### or if it's a door we have a key to, move forward
+      if(u=="."||u==target||(u%in%LETTERS&tolower(u)%in%kys)||u%in%kys){
+        pq$push(list(currx,curry-1,u,currs+1),-currs-1-umd)}}
+    ### down 
+    if(curry<maxy){
+      d<-vmp$get(str_flatten(c(currx,curry+1)," "))
+      dmd<-sum(abs(currc+c(0,1)-tc))
+      ### if it's a path go there or if it's the target
+      ### or if it's a door we have a key to, move forward
+      if(d=="."||d==target||(d%in%LETTERS&tolower(d)%in%kys)||d%in%kys){
+        pq$push(list(currx,curry+1,d,currs+1),-currs-1-dmd)}}
+    ### left
+    if(currx>1){
+      l<-vmp$get(str_flatten(c(currx-1,curry)," "))
+      lmd<-sum(abs(currc+c(-1,0)-tc))
+      ### if it's a path go there or if it's the target
+      ### or if it's a door we have a key to, move forward
+      if(l=="."||l==target||(l%in%LETTERS&tolower(l)%in%kys)||l%in%kys){
+        pq$push(list(currx-1,curry,l,currs+1),-currs-1-lmd)}}
+    ### right
+    if(currx<maxx){
+      r<-vmp$get(str_flatten(c(currx+1,curry)," "))
+      rmd<-sum(abs(currc+c(1,0)-tc))
+      ### if it's a path go there or if it's the target
+      ### or if it's a door we have a key to, move forward
+      if(r=="."||r==target||(r%in%LETTERS&tolower(r)%in%kys)||r%in%kys){
+        pq$push(list(currx+1,curry,r,currs+1),-currs-1-lmd)}}}
+  list(target,finished,tc[1],tc[2])}
+
+```
+
+
+```{r}
+memquick<-memoize(quickstep)
+```
+
+
+New multi Finder
+```{r}
+mrkfinder<-function(input){
+  ### read the vault map into the dictionary and find the start space(s)
+  vmp<-dict()
+  lmp<-dict()
+  maxy<-length(input)
+  maxx<-nchar(input[1])
+  robotxs<-c()
+  robotys<-c()
+  allkeys<-c()
+  keysx<-c()
+  keysy<-c()
+  for(i in 1:maxy){
+    a<-input[i]
+    for(j in 1:maxx){
+      ## adds everything to the map
+      y<-str_sub(a,j,j)
+      b<-str_flatten(c(j,i)," ")
+      vmp$set(b,y)
+      ### changes robot starts to "." and gets the list of robots
+      if(y=="@"){vmp$set(b,".")
+        robotxs<-c(robotxs,j)
+        robotys<-c(robotys,i)}
+      if(y %in% letters){
+        ### gets the list of letters for the target search, for the key search, and to adjust the hueristic 
+        lmp$set(y,c(j,i))
+        allkeys<-c(allkeys,y)
+        keysx<-c(keysx,j)
+        keysy<-c(keysy,i)
+      }}}
+  minmd<-Inf
+  ### get the minmanhattan distance
+  for(i in 1:(length(keysx)-1)){
+    for(j in (i+1):length(keysx)){
+      md<-abs(keysx[i]-keysx[j])+abs(keysy[i]-keysy[j])
+      if(md<minmd){cat(md,i,j," - ")
+        minmd<-md}}}
+  cat(minmd,"\n")
+  allkeys<-sort(allkeys)
+  nk<-length(allkeys)
+  finished<-Inf
+  ### 
+  beenthere<-dict()
+  ### priority is number of steps + the number of keys left
+  pq<-priority_queue()
+  ### pushing xs,ys, keys, and steps
+  startline<-list(robotxs,robotys,c(),0)
+  pq$push(startline,nk*md)
+  keysunfound<- Inf
+  roundcount<-1
+  while(pq$size()>0){
+    curr<-pq$pop()
+    currxs<-curr[[1]]
+    currys<-curr[[2]]
+    currk<-curr[[3]]
+    currs<-curr[[4]]
+    keysleft<-allkeys[which(!allkeys%in%currk)]
+    nkl<-length(keysleft)
+    ### get some data
+    if(nkl<keysunfound){
+      cat("keys left: ",nkl," round: ",roundcount," steps: ",currs," queue: ",pq$size()," keys: ", currk,"\n")
+      keysunfound<-nkl}
+    ### if all of the keys are in currk - we've won!stop
+    if(all(allkeys%in%currk)){
+      cat("order: ",currk," steps: ",currs,"\n")
+      return(currs)
+      break}
+    ### if have been here before, get out - check by sorting the keys.
+    ### this is why it matters that the  robots can't be in each other's spaces
+    ### would need to change this if they could
+    bt<-str_flatten(c(currxs,currys,sort(currk))," ")
+    if(beenthere$has(bt)){next}
+    beenthere$set(bt,currs)
+    ### otherwise, for each robot, run quickstep against all keys that it doesn't already have.
+    ### If it is possible to get there, add it to queue otherwise
+    for(i in 1:length(robotxs)){
+      robx<-currxs[i]
+      roby<-currys[i]
+      nextxs<-currxs
+      nextys<-currys
+      rnexts<-lapply(keysleft,function(kl){
+#        o<-quickstep(robx,roby,vmp,currk,maxx,maxy,kl,lmp)
+        o<-memquick(robx,roby,vmp,currk,maxx,maxy,kl,lmp)
+        o})
+      ### on the odd chance that something went wonky
+      if(length(rnexts)>0){
+        for(j in 1:length(rnexts)){
+          if(rnexts[[j]][[2]]!=Inf){
+            nextxs[i]<-rnexts[[j]][[3]]
+            nextys[i]<-rnexts[[j]][[4]]
+            pq$push(list(nextxs,nextys,c(currk,rnexts[[j]][[1]]),currs+rnexts[[j]][[2]]),
+                    -currs-rnexts[[j]][[2]]-((nkl-1)*minmd))}}}}
+    
+    roundcount<-roundcount+1
+    }
+  cat("not done - ")
+  cat("order: ",currk," steps: ",currs,"\n")
+  return(currs)}
+
+
+```
+
+
+```{r}
+#input<-read_lines("Day18Sample8.txt")
+input<-read_lines("../../AoCData/AOC2019/Day18Part2.txt")
+
+```
+
+
+
+```{r}
+mrkfinder(input)
+```
+
+
+```{r,echo=FALSE}
+# basicgraph<-ggplot()+
+#   theme(axis.text.x = element_blank(),
+#         axis.ticks.x = element_blank(),
+#         axis.text.y = element_blank(),
+#         axis.ticks.y = element_blank(),
+#         axis.title.y = element_blank(),
+#         axis.title.x = element_blank(),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         legend.position="none")+
+#   scale_y_reverse()+
+#   coord_fixed()
+# basicgraph
+```
+

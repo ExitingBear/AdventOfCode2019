@@ -14,12 +14,6 @@ library(collections)
 options(scipen = 999)
 ```
 
-```{r}
-#input<-read_lines("Day4Sample.txt")
-input<-read_lines("../../AoCData/AOC2018/Day4.txt")
-
-```
-
 ## Part 1
 
 This finds a valid pass
@@ -48,8 +42,8 @@ findvps<-function(low,high){
 validcount}
 ```
 
-```{r}
-part1<-findvps(402328,864247)
+```{r,eval=FALSE}
+part1<-findvps()
 part1
 ```
 
@@ -89,7 +83,9 @@ findvps2<-function(low,high){
 validcount}
 ```
 
-```{r}
-part2<-findvps2(402328,864247)
+Not showing the range
+
+```{r,eval=FALSE}
+part2<-findvps2()
 part2
 ```

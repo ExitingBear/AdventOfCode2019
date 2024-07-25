@@ -17,7 +17,7 @@ options(scipen = 999)
 
 ## The Intcode
 
-```{r}
+```{r intcode}
 iccomp<-function(prg,inp,starthere,relativebase,quiet){
   i<-starthere
   outp<-c()
@@ -156,17 +156,17 @@ intcode<-as.numeric(unlist(str_split(input,",")))
 ```
 
 
-```{r}
+```{r input}
 tractorbeam<-as.data.frame(matrix(ncol=3,nrow=0))
-for(i in 0:1000){
-  for(j in 0:1000){
+for(i in 0:49){
+  for(j in 0:49){
     v<-iccomp(intcode,c(i,j),1,0,T)[[2]]
     tractorbeam<-rbind(tractorbeam,c(i,j,v))}}
 colnames(tractorbeam)<-c("x","y","st")
 ```
 
 
-```{r,echo=FALSE}
+```{r graph,echo=FALSE}
  basicgraph<-ggplot()+
   geom_tile(data=tractorbeam,aes(x=x,y=y,fill=st))+
    theme(axis.text.x = element_blank(),
@@ -184,7 +184,7 @@ colnames(tractorbeam)<-c("x","y","st")
 ```
 
 
-```{r}
+```{r part1}
 part1<-sum(tractorbeam$st)
 part1
 ```
@@ -207,12 +207,12 @@ Then just need the eqs for the upper and lower lines:
 
 
 
-```{r}
+```{r findtopline}
 upperline<-tractorbeam%>%filter(st==1)%>%filter(y<850)%>%group_by(y)%>%summarise(x=max(x))
 upperline
 lm(upperline$y~upperline$x)
 ```
-```{r}
+```{r findbottomline}
 lowerline<-tractorbeam%>%filter(st==1)%>%group_by(y)%>%summarise(x=min(x))
 lowerline
 lm(lowerline$y~lowerline$x)
@@ -225,7 +225,7 @@ ya-1.0294*xa = -0.5237
 yb-1.1397*xb = -0.5624
 
 
-```{r}
+```{r usesolver}
 #Using solve:
 #xa, ya, xb, yb, c  
 A<-rbind(
@@ -244,7 +244,7 @@ So the answers are likely close to (1921,1977) & (1822,2076)
 Try x from 1772 to 1971 & y from 1927 to 2126 (about 50 up and down)
 
 
-```{r}
+```{r check_nearby_numbers}
 tractor2<-as.data.frame(matrix(ncol=3,nrow=0))
 for(i in 1772:1971){
   for(j in 1927:2126){
@@ -254,7 +254,7 @@ colnames(tractor2)<-c("x","y","st")
 ```
 
 
-```{r,echo=FALSE}
+```{r graph2,echo=FALSE}
  part2graph<-ggplot()+
   geom_tile(data=tractor2,aes(x=x,y=y,fill=st))+
   geom_segment(aes(x=1921,y=1977,xend=1822,yend=1977))+
@@ -276,7 +276,7 @@ colnames(tractor2)<-c("x","y","st")
 ```
 This is very close to right - 
 Figure out where it gets wide enough
-```{r}
+```{r narrowdown}
 ### filter out where st is 1
 findsquare<-tractor2%>%filter(st==1)%>%
   ### for each y, find the highest x
@@ -292,18 +292,16 @@ findsquare
 
 ```
 
-```{r}
-findsquare$oppbeam
-```
+
 The earliest that the opposite is 1 is the answer
 
-```{r}
+```{r narrowfurther}
 findsquare<-findsquare%>%filter(oppbeam==1)%>%arrange(y)
 findsquare
 ```
 So, the closestsquare is (1826,1982)  (5 off in each direction!)
 
-```{r}
+```{r part2}
 part2<-10000*1826+1982
 part2
 ```

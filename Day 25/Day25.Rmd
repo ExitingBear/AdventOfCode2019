@@ -1,13 +1,9 @@
 ---
-title: "Day XX Notebook"
+title: "Day 25 Notebook"
 output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(reshape2)
 library(knitr)
 library(dplyr)
@@ -18,33 +14,169 @@ library(collections)
 options(scipen = 999)
 ```
 
-```{r}
-input<-read_lines("DayXXSample.txt")
-#input<-read_lines("../../AoCData/AOC2018/DayXX.txt")
-
-```
+## The Intcode
 
 ```{r}
-### Matrix
-diagnosticreport<-matrix(0,nrow=length(input),ncol=nchar(input[1]))
-for(i in 1:length(input)){diagnosticreport[i,]<-as.numeric(unlist(str_split(input[i],"")))}
-
+iccomp<-function(prg,inp,starthere,relativebase,quiet){
+  i<-starthere
+  outp<-c()
+  while(prg[i]!=99){
+    ## make sure that at least the next three numbers exist
+    if((i+3)>length(prg)){
+      prg<-c(prg,
+             rep(0,(i+3-length(prg))))}
+    opcode<-as.character(prg[i]%%100)
+    firstp<-(prg[i]%/%100)%%10
+    secondp<-(prg[i]%/%1000)%%10
+    thirdp<-prg[i]%/%10000
+    switch(opcode,
+           ### add
+           "1"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a+b
+             i<-i+4},
+           ### multiply
+           "2"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             prg[c+1]<-a*b
+             i<-i+4},
+           ### input
+           "3"={
+             if(firstp==0){a<-prg[i+1]}
+             if(firstp==2){a<-prg[i+1]+relativebase}
+             if(is.na(a)){a<-0}
+             if(length(inp)==0){
+               if(quiet==F){cat("waiting---\n")}
+               return(list(prg,outp,i,relativebase))
+             }else{
+              # if(quiet==F){cat("input: ",inp[1]," - ")}
+               prg[a+1]<-inp[1]
+               inp<-inp[-1]
+               i<-i+2}},
+           ### output
+           "4"={
+             a<-prg[i+1]
+             if(firstp==0){
+               a<-prg[a+1]}
+             if(firstp==2){
+               a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(quiet==F){cat("output: ",a,"\n")}
+             outp<-c(outp,a)
+             i<-i+2},
+           ### jump if true
+           "5"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a!=0){i<-b+1}else{i<-i+3}},
+           ### jump if false
+           "6"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             if(a==0){i<-b+1}else{i<-i+3}},
+           ### less than
+           "7"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a<b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "8"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             b<-prg[i+2]
+             if(secondp==0){b<-prg[b+1]}
+             if(secondp==2){b<-prg[b+1+relativebase]}
+             if(is.na(a)){a<-0}
+             if(is.na(b)){b<-0}
+             c<-prg[i+3]
+             if(thirdp==2){c<-prg[i+3]+relativebase}
+             if(a==b){prg[c+1]<-1}else{prg[c+1]<-0}
+             i<-i+4},
+           "9"={
+             a<-prg[i+1]
+             if(firstp==0){a<-prg[a+1]}
+             if(firstp==2){a<-prg[a+1+relativebase]}
+             if(is.na(a)){a<-0}
+             relativebase<-relativebase+a
+             i<-i+2},
+           {cat(i,": unknown opcode",opcode,"\n")
+             break})
+    prg<-replace(prg,is.na(prg),0)}
+  #  cat("ENDING i: ",i," fullinst: ",prg[i]," opcode: ",opcode,"\n")
+  return(list(prg,outp,0,relativebase))}
 ```
 
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse()+
-  coord_fixed()
-basicgraph
+```{r}
+input<-read_lines("../../AoCData/AOC2019/Day25.txt")
+intcode<-as.numeric(unlist(str_split(input,",")))
+```
+
+
+This wraps the intcode - prompts and reads input 
+
+```{r,eval=FALSE}
+airlockfinder<-function(prg){
+  keepgoing<-TRUE
+  rb<-0
+  si<-1
+  prmpt<-c()
+  while(keepgoing){
+    see<-iccomp(prg,prmpt,si,rb,T)
+    si<-see[[3]]
+    rb<-see[[4]]
+    prg<-see[[1]]
+    if(all(see[[2]]==0)){break}
+    askme<-str_flatten(sapply(see[[2]],function(x){intToUtf8(x)}))
+    askme<-str_c(askme,"\n")
+    cat(askme)
+    prmpt<-readline(prompt="?")
+    cat(prmpt,"\n")
+    prmpt<-c(unname(sapply(unlist(str_split(prmpt,"")),utf8ToInt)),10)}
+  
+see[[2]]}
+```
+
+```{r,eval=FALSE}
+airlockfinder(intcode)
 ```
 
