@@ -16,16 +16,22 @@ library(collections)
 options(scipen = 999)
 ```
 
+
+## Part 1
+
 ```{r}
 input<-read_lines("../../AoCData/AOC2019/Day22.txt")
 ```
 
+For part 1, I'm manipulating the deck
 
+This reverses the deck:
 ```{r}
 newstack<-function(d){
   rev(d)}
 ```
 
+This cuts it (both pos & neg work)
 ```{r}
 cutdeck<-function(d,n){
   n<-n%%length(d)
@@ -34,9 +40,8 @@ cutdeck<-function(d,n){
   outdeck}
 ```
 
-```{r}
-cutdeck(0:9,3)
-```
+This does the "deal with increment" shuffle
+
 ```{r}
 dwi<-function(d,n){
   outdeck<-c()
@@ -47,22 +52,20 @@ dwi<-function(d,n){
   outdeck}
 ```
 
-```{r}
-dwi(0:9,3)
-```
-```{r}
-cutdeck(dwi(dwi(0:9,7),9),-2)
-```
+This function reads in the instructions, does them all and returns a shuffled, manipulated deck
+
 ```{r}
 shufflepart1<-function(d,instructions){
   i<-1
   while(i<=length(instructions)){
     inst<-unlist(str_split(instructions[i]," "))
-   # cat(inst,"\n")
+    ### if the first word is cut, cut
     if(inst[1]=="cut"){
       d<-cutdeck(d,as.numeric(inst[2]))
+    ### otherwise if the second word is "into" reverse the deck
     }else if(inst[2]=="into"){
       d<-newstack(d)
+    ### otherwise if the second word is "with" then deal with increment
     }else if(inst[2]=="with"){
       d<-dwi(d,as.numeric(inst[4]))
     }else{cat("Someting went wrong\n")}
@@ -70,12 +73,17 @@ shufflepart1<-function(d,instructions){
   d}
 ```
 
+Part 1 - run this against my input & get the answer
+
 ```{r}
 p1<-shufflepart1(0:10006,input)
 part1<-which(p1==2019)-1
 part1
 
 ```
+
+
+
 
 ```{r}
 p1<-0:10006
@@ -91,84 +99,10 @@ for(i in 1:10){
 
 ## Part 2 - 
 
-Can't brute it - so
+My attempt to use modular arithmetic:
 
 
-Where do things go:
-
-
-```{r}
-aftercut<-function(decksize,stpos,n){
-  endpos<-(stpos-n)%%decksize
-  if(endpos==0){endpos<-decksize}
-  endpos}
-
-
-```
-
-
-```{r}
-aftercut(10,1,3)
-q<-sapply(1:10,function(x){aftercut(10,x,-4)})
-(0:10)[order(q)]
-
-```
-
-```{r}
-afternew<-function(decksize,stpos){
-  endpos<-decksize+1-stpos
-  endpos}
-```
-
-```{r}
-q<-sapply(1:10,function(x){afternew(10,x)})
-(0:10)[order(q)]
-
-
-```
-
-```{r}
-afterinc<-function(decksize,stpos,n){
-  endpos<-(((stpos-1)*n)+1)%%decksize
-  if(endpos==0){endpos<-decksize}
-  endpos}
-```
-
-
-
-
-
-```{r}
-q<-sapply(1:10,function(x){afterinc(10,x,3)})
-q
-```
-```{r}
-(0:10)[order(q)]
-```
-
-
-This uses the above to take in the starting card *position* (not starting card number.  Because it is 1 indexed, 2019 is at position 2020)
-```{r}
-finalcardposition<-function(decksize,instructions,stpo){
-  i<-1
-  while(i<=length(instructions)){
-    inst<-unlist(str_split(instructions[i]," "))
-    if(inst[1]=="cut"){
-      stpo<-aftercut(decksize,stpo,as.numeric(inst[2]))
-    }else if(inst[2]=="into"){
-      stpo<-afternew(decksize,stpo)
-    }else if(inst[2]=="with"){
-      stpo<-afterinc(decksize,stpo,as.numeric(inst[4]))
-    }else{cat("Someting went wrong\n")}
-    i<-i+1}
-  ### realigns to be 0 indexed
-  stpo}
-```
-
-
-###############
-Trying one more time using modular arithmetic:
-
+This takes the decksize & the instructions and returns with the coefficients of the equation that would solve it in one go: 
 ```{r}
 modtransform<-function(decksize,instructions){
   a<-1
@@ -177,12 +111,16 @@ modtransform<-function(decksize,instructions){
   i<-1
   while(i<=length(instructions)){
     inst<-unlist(str_split(instructions[i]," "))
+    
+    ### cut
     if(inst[1]=="cut"){
       c<-1
       d<- -as.numeric(inst[2])
+    ### reverse
     }else if(inst[2]=="into"){
       c<- -1
       d<- -1
+    ### deal with increment
     }else if(inst[2]=="with"){
       c<- as.numeric(inst[4])
       d<- 0
@@ -190,24 +128,50 @@ modtransform<-function(decksize,instructions){
     a<-(a*c)%%m
     b<-(b*c+d)%%m
     i<-i+1}
-  ### realigns to be 0 indexed
   c(a,b)}
 
 ```
 
 
+For a deck size of 10007, this is the answer:
 ```{r}
 modtransform(10007,input)
+###
 ```
+The A is 9390.  The B is 7459.
 
+For a sanity check - this is what the old method gives for the position of card 2019 the first 10 shuffles of a 10007 card deck
 
 ```{r}
-yr<-2019
+p1<-0:10006
+x<-2019
+oldmethod<-c()
 for(i in 1:10){
-yr<-(9390*yr+7459)%%10007
-cat(yr,"\n")}
+  p1<-shufflepart1(p1,input)
+  x<-which(p1==2019)-1
+  oldmethod<-c(oldmethod,x)
+}
+oldmethod
 ```
 
+
+And this is what the new method gives
+```{r}
+crd<-2019
+newmethod<-c()
+for(i in 1:10){
+crd<-(9390*crd+7459)%%10007
+newmethod<-c(newmethod,crd)}
+newmethod
+
+cat("compare old method and new method: ", oldmethod==newmethod,"\n")
+
+
+```
+They are the same - so I think that the modular is working.
+
+
+This is just the function for composing Ax+B onto Cx+D mod M
 ```{r}
 cmps<-function(a,b,c,d,m){
   a<-(a*c)%%m
@@ -215,8 +179,10 @@ cmps<-function(a,b,c,d,m){
   c(a,b)}
 ```
 
+
+This takes the function Ax+B and raises it to the k (shuffles multiple times)
 ```{r}
-ebs<-function(a,b,k,decksize,t){
+multishuffle<-function(a,b,k,decksize,t){
   c<-1
   d<-0
   while(k>0){
@@ -228,88 +194,76 @@ ebs<-function(a,b,k,decksize,t){
   f<-cmps(a,b,a,b,decksize)
   a<-f[1]
   b<-f[2]}
-  
-  cat(((c*t)+d)%%decksize,"\n")
-  #c(c,d)
-  
   (c*t+d)%%decksize}
 
 ```
 
 
-
-```{r}
-ebs(9390,7459,1,10007,2019)
-
-q<-2019
-for(i in 1:10){
-  q<-ebs(9390,7459,i,10007,2019)
-  cat(q,"\n")
-}
-
-
-
-```
-
-```{r}
-bigdeck<-(119315717514047)
-bigshuffle<-(101741582076661)
-
-```
-
-
-
-
-```{r}
-AB<-modtransform(bigdeck,input)
-
-### This is the transform of it once.
-
-bigA<-AB[1]
-bigB<-AB[2]
-
-```
-
+And again, using 10007 and card 2019 - this is where it goes for the first 10 shuffles
 ```{r}
 
-ebs(bigA,bigB,bigshuffle,bigdeck,1)
+multishuffleversion<-c()
+for(i in 1:10){multishuffleversion<-c(multishuffleversion,multishuffle(9390,7459,i,10007,2019))}
 
-### So this - 
+multishuffleversion
+
+cat("compare new method & multishuffle: ", multishuffleversion==newmethod,"\n")
+
 ```
+So this gives the same answer
+
+BUT!!!!!!!!!!
+
+The question asks for the card in position 2020, not where 2020 ends up.  So, it needs the inverse function
+
+And to find that, you find the inverse of A for that deck size
 
 ```{r}
-### 54484076068864 58680795987968
+### A
+modinv(9390,10007)
+### B
+(modinv(9390,10007)*-7459)%%10007
 ```
-
-
-SO - I think
-
-2020=54484076068864 *x+58680795987968 (mod 119315717514047)
-2020-58680795987968=54484076068864 *x (mod 119315717514047)
-
-find the modular multiplicative inverse
+So, to find what card was in that position, you can use 519 & 8519 (with these instructions on a deck of 10007)
+To show that makes sense, try it on the first 10 shuffle positions - all of them should return 2019:
 
 ```{r}
-modinv(54484076068864,119315717514047)
+sapply(1:10,function(x){multishuffle(519,1488,x,10007,multishuffleversion[x])})
 ```
-(2020-86304683458560)\*420286289049=55474871336960\*420286289049\*x
+Exactly as expected.
 
+----
 
-Which is  81151119716072
+So trying this with a really, really, really big deck and a lot of shuffles:
+
 
 
 ```{r}
-((2020-86304683458560)*420286289049)%%119315717514047
+modtransform(119315717514047,input)
+```
+A=28480444974763
+B=104343029082553
+
+
+Invert the A & B:
+```{r}
+### A
+modinv(28480444974763,119315717514047)
+### B
+(modinv(28480444974763,119315717514047)*-104343029082553)%%119315717514047
 
 ```
-x = 81947887346318
+And run that through multishuffle:
 
-WHICH IS STILL FUCKING WRONG and technically more wrong than it was.
-
-
-
+```{r}
+multishuffle(82675948719931,791884595200,101741582076661,119315717514047,2020)
+```
+AND THAT'S THE WRONG ANSWER
 ----------------------------
 
+So, trying this backwards:
+
+This function does the reverse of everything.  It cuts backwards, it reverses (which is the same either way), it deals into backwards.
 ```{r}
 inverstrans<-function(decksize,instructions){
   a<-1
@@ -339,80 +293,26 @@ inverstrans<-function(decksize,instructions){
   c(a,b)}
 ```
 
-
-
-```{r}
-inverstrans(119315717514047,rev(input))
-
-### 1 transform
-
-```
-```{r}
-ebs(43018258219008,33143725761322,bigshuffle,10007,2020)
-```
-
+Again showing that it works with 10007
 
 ```{r}
 inverstrans(10007,rev(input))
-
-### 1 transform
-
 ```
+And those numbers may look familiar - because they're the same as above.  And so it's clear that this should work
 
 
 
-
-
-```{r}
-ebs(54484076068864,58680795987968,bigshuffle,bigdeck,1)
-```
-```{r}
-a<-sample(1:10007,20)
-
-b<-sapply(a,function(x){
-  ebs(9390,7459,x,10007,2019)
-})
-b
-
-lll<-sapply(1:20,function(x){
-  ebs(519,1488,a[x],10007,b[x])
-})
-lll
-```
-
-
-
-```{r}
-largedeck<-as.integer64(119315717514047)
-largeshuffle<-as.integer64(101741582076661)
-```
-
-
-```{r}
-a<-sample(1:5000,20)
-```
-
-
-
+On the really big deck:
 ```{r}
 inverstrans(119315717514047,rev(input))
-
-### 1 transform
-
 ```
+Those are different numbers than above, but maybe they'll work.
 
-
+run through multishuffle: 
 
 ```{r}
-b<-sapply(a,function(x){
-  ebs(54484076068864,58680795987968,x,119315717514047,2019)
-})
-b
-
-lll<-sapply(1:20,function(x){
-  ebs(43018258219008,33143725761322,a[x],119315717514047,b[x])
-})
-lll
+multishuffle(43018258219008,33143725761322,101741582076661,119315717514047,2020)
 ```
+which is still the wrong answer.
 
 
