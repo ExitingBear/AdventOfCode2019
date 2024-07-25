@@ -1754,15 +1754,17 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
+<div id="part-1" class="section level2">
+<h2>Part 1</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2lucHV0PC1yZWFkX2xpbmVzKFwiRGF5MjJTYW1wbGUudHh0XCIpXG5pbnB1dDwtcmVhZF9saW5lcyhcIi4uLy4uL0FvQ0RhdGEvQU9DMjAxOS9EYXkyMi50eHRcIilcblxuYGBgIn0= -->
-<pre class="r"><code>#input&lt;-read_lines(&quot;Day22Sample.txt&quot;)
-input&lt;-read_lines(&quot;../../AoCData/AOC2019/Day22.txt&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXQ8LXJlYWRfbGluZXMoXCIuLi8uLi9Bb0NEYXRhL0FPQzIwMTkvRGF5MjIudHh0XCIpXG5gYGAifQ== -->
+<pre class="r"><code>input&lt;-read_lines(&quot;../../AoCData/AOC2019/Day22.txt&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>For part 1, I’m manipulating the deck</p>
+<p>This reverses the deck:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubmV3c3RhY2s8LWZ1bmN0aW9uKGQpe1xuICByZXYoZCl9XG5gYGAifQ== -->
@@ -1771,6 +1773,7 @@ input&lt;-read_lines(&quot;../../AoCData/AOC2019/Day22.txt&quot;)
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>This cuts it (both pos &amp; neg work)</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3V0ZGVjazwtZnVuY3Rpb24oZCxuKXtcbiAgbjwtbiUlbGVuZ3RoKGQpXG4gIG91dGRlY2s8LWRcbiAgb3V0ZGVjazwtYyhkWy1jKDE6bildLGRbYygxOm4pXSlcbiAgb3V0ZGVja31cbmBgYCJ9 -->
@@ -1782,15 +1785,8 @@ input&lt;-read_lines(&quot;../../AoCData/AOC2019/Day22.txt&quot;)
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>This does the “deal with increment” shuffle</p>
 <!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3V0ZGVjaygwOjksMylcbmBgYCJ9 -->
-<pre class="r"><code>cutdeck(0:9,3)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAzIDQgNSA2IDcgOCA5IDAgMSAyXG4ifQ== -->
-<pre><code> [1] 3 4 5 6 7 8 9 0 1 2</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZHdpPC1mdW5jdGlvbihkLG4pe1xuICBvdXRkZWNrPC1jKClcbiAgZm9yKGkgaW4gMTpsZW5ndGgoZCkpe1xuICAgIHg8LSgoaS0xKSpuKzEpJSVsZW5ndGgoZClcbiAgICBpZih4PT0wKXt4PC1sZW5ndGgoZCl9XG4gICAgb3V0ZGVja1t4XTwtZFtpXX1cbiAgb3V0ZGVja31cbmBgYCJ9 -->
 <pre class="r"><code>dwi&lt;-function(d,n){
@@ -1803,34 +1799,22 @@ input&lt;-read_lines(&quot;../../AoCData/AOC2019/Day22.txt&quot;)
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>This function reads in the instructions, does them all and returns a
+shuffled, manipulated deck</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZHdpKDA6OSwzKVxuYGBgIn0= -->
-<pre class="r"><code>dwi(0:9,3)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAwIDcgNCAxIDggNSAyIDkgNiAzXG4ifQ== -->
-<pre><code> [1] 0 7 4 1 8 5 2 9 6 3</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3V0ZGVjayhkd2koZHdpKDA6OSw3KSw5KSwtMilcbmBgYCJ9 -->
-<pre class="r"><code>cutdeck(dwi(dwi(0:9,7),9),-2)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSA2IDMgMCA3IDQgMSA4IDUgMiA5XG4ifQ== -->
-<pre><code> [1] 6 3 0 7 4 1 8 5 2 9</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2h1ZmZsZXBhcnQxPC1mdW5jdGlvbihkLGluc3RydWN0aW9ucyl7XG4gIGk8LTFcbiAgd2hpbGUoaTw9bGVuZ3RoKGluc3RydWN0aW9ucykpe1xuICAgIGluc3Q8LXVubGlzdChzdHJfc3BsaXQoaW5zdHJ1Y3Rpb25zW2ldLFwiIFwiKSlcbiAgICMgY2F0KGluc3QsXCJcXG5cIilcbiAgICBpZihpbnN0WzFdPT1cImN1dFwiKXtcbiAgICAgIGQ8LWN1dGRlY2soZCxhcy5udW1lcmljKGluc3RbMl0pKVxuICAgIH1lbHNlIGlmKGluc3RbMl09PVwiaW50b1wiKXtcbiAgICAgIGQ8LW5ld3N0YWNrKGQpXG4gICAgfWVsc2UgaWYoaW5zdFsyXT09XCJ3aXRoXCIpe1xuICAgICAgZDwtZHdpKGQsYXMubnVtZXJpYyhpbnN0WzRdKSlcbiAgICB9ZWxzZXtjYXQoXCJTb21ldGluZyB3ZW50IHdyb25nXFxuXCIpfVxuICAgIGk8LWkrMX1cbiAgZH1cbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2h1ZmZsZXBhcnQxPC1mdW5jdGlvbihkLGluc3RydWN0aW9ucyl7XG4gIGk8LTFcbiAgd2hpbGUoaTw9bGVuZ3RoKGluc3RydWN0aW9ucykpe1xuICAgIGluc3Q8LXVubGlzdChzdHJfc3BsaXQoaW5zdHJ1Y3Rpb25zW2ldLFwiIFwiKSlcbiAgICAjIyMgaWYgdGhlIGZpcnN0IHdvcmQgaXMgY3V0LCBjdXRcbiAgICBpZihpbnN0WzFdPT1cImN1dFwiKXtcbiAgICAgIGQ8LWN1dGRlY2soZCxhcy5udW1lcmljKGluc3RbMl0pKVxuICAgICMjIyBvdGhlcndpc2UgaWYgdGhlIHNlY29uZCB3b3JkIGlzIFwiaW50b1wiIHJldmVyc2UgdGhlIGRlY2tcbiAgICB9ZWxzZSBpZihpbnN0WzJdPT1cImludG9cIil7XG4gICAgICBkPC1uZXdzdGFjayhkKVxuICAgICMjIyBvdGhlcndpc2UgaWYgdGhlIHNlY29uZCB3b3JkIGlzIFwid2l0aFwiIHRoZW4gZGVhbCB3aXRoIGluY3JlbWVudFxuICAgIH1lbHNlIGlmKGluc3RbMl09PVwid2l0aFwiKXtcbiAgICAgIGQ8LWR3aShkLGFzLm51bWVyaWMoaW5zdFs0XSkpXG4gICAgfWVsc2V7Y2F0KFwiU29tZXRpbmcgd2VudCB3cm9uZ1xcblwiKX1cbiAgICBpPC1pKzF9XG4gIGR9XG5gYGAifQ== -->
 <pre class="r"><code>shufflepart1&lt;-function(d,instructions){
   i&lt;-1
   while(i&lt;=length(instructions)){
     inst&lt;-unlist(str_split(instructions[i],&quot; &quot;))
-   # cat(inst,&quot;\n&quot;)
+    ### if the first word is cut, cut
     if(inst[1]==&quot;cut&quot;){
       d&lt;-cutdeck(d,as.numeric(inst[2]))
+    ### otherwise if the second word is &quot;into&quot; reverse the deck
     }else if(inst[2]==&quot;into&quot;){
       d&lt;-newstack(d)
+    ### otherwise if the second word is &quot;with&quot; then deal with increment
     }else if(inst[2]==&quot;with&quot;){
       d&lt;-dwi(d,as.numeric(inst[4]))
     }else{cat(&quot;Someting went wrong\n&quot;)}
@@ -1839,6 +1823,7 @@ input&lt;-read_lines(&quot;../../AoCData/AOC2019/Day22.txt&quot;)
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>Part 1 - run this against my input &amp; get the answer</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucDE8LXNodWZmbGVwYXJ0MSgwOjEwMDA2LGlucHV0KVxucGFydDE8LXdoaWNoKHAxPT0yMDE5KS0xXG5wYXJ0MVxuYGBgIn0= -->
@@ -1876,116 +1861,15 @@ for(i in 1:10){
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
 <div id="part-2--" class="section level2">
 <h2>Part 2 -</h2>
-<p>Can’t brute it - so</p>
-<p>Where do things go:</p>
+<p>My attempt to use modular arithmetic:</p>
+<p>This takes the decksize &amp; the instructions and returns with the
+coefficients of the equation that would solve it in one go:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWZ0ZXJjdXQ8LWZ1bmN0aW9uKGRlY2tzaXplLHN0cG9zLG4pe1xuICBlbmRwb3M8LShzdHBvcy1uKSUlZGVja3NpemVcbiAgaWYoZW5kcG9zPT0wKXtlbmRwb3M8LWRlY2tzaXplfVxuICBlbmRwb3N9XG5cblxuYGBgIn0= -->
-<pre class="r"><code>aftercut&lt;-function(decksize,stpos,n){
-  endpos&lt;-(stpos-n)%%decksize
-  if(endpos==0){endpos&lt;-decksize}
-  endpos}
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWZ0ZXJjdXQoMTAsMSwzKVxuYGBgIn0= -->
-<pre class="r"><code>aftercut(10,1,3)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDhcbiJ9 -->
-<pre><code>[1] 8</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTwtc2FwcGx5KDE6MTAsZnVuY3Rpb24oeCl7YWZ0ZXJjdXQoMTAseCwtNCl9KVxuKDA6MTApW29yZGVyKHEpXVxuYGBgIn0= -->
-<pre class="r"><code>q&lt;-sapply(1:10,function(x){aftercut(10,x,-4)})
-(0:10)[order(q)]</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSA2IDcgOCA5IDAgMSAyIDMgNCA1XG4ifQ== -->
-<pre><code> [1] 6 7 8 9 0 1 2 3 4 5</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWZ0ZXJuZXc8LWZ1bmN0aW9uKGRlY2tzaXplLHN0cG9zKXtcbiAgZW5kcG9zPC1kZWNrc2l6ZSsxLXN0cG9zXG4gIGVuZHBvc31cbmBgYCJ9 -->
-<pre class="r"><code>afternew&lt;-function(decksize,stpos){
-  endpos&lt;-decksize+1-stpos
-  endpos}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTwtc2FwcGx5KDE6MTAsZnVuY3Rpb24oeCl7YWZ0ZXJuZXcoMTAseCl9KVxuKDA6MTApW29yZGVyKHEpXVxuYGBgIn0= -->
-<pre class="r"><code>q&lt;-sapply(1:10,function(x){afternew(10,x)})
-(0:10)[order(q)]</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSA5IDggNyA2IDUgNCAzIDIgMSAwXG4ifQ== -->
-<pre><code> [1] 9 8 7 6 5 4 3 2 1 0</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYWZ0ZXJpbmM8LWZ1bmN0aW9uKGRlY2tzaXplLHN0cG9zLG4pe1xuICBlbmRwb3M8LSgoKHN0cG9zLTEpKm4pKzEpJSVkZWNrc2l6ZVxuICBpZihlbmRwb3M9PTApe2VuZHBvczwtZGVja3NpemV9XG4gIGVuZHBvc31cbmBgYCJ9 -->
-<pre class="r"><code>afterinc&lt;-function(decksize,stpos,n){
-  endpos&lt;-(((stpos-1)*n)+1)%%decksize
-  if(endpos==0){endpos&lt;-decksize}
-  endpos}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTwtc2FwcGx5KDE6MTAsZnVuY3Rpb24oeCl7YWZ0ZXJpbmMoMTAseCwzKX0pXG5xXG5gYGAifQ== -->
-<pre class="r"><code>q&lt;-sapply(1:10,function(x){afterinc(10,x,3)})
-q</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAgMSAgNCAgNyAxMCAgMyAgNiAgOSAgMiAgNSAgOFxuIn0= -->
-<pre><code> [1]  1  4  7 10  3  6  9  2  5  8</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuKDA6MTApW29yZGVyKHEpXVxuYGBgIn0= -->
-<pre class="r"><code>(0:10)[order(q)]</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAwIDcgNCAxIDggNSAyIDkgNiAzXG4ifQ== -->
-<pre><code> [1] 0 7 4 1 8 5 2 9 6 3</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>This uses the above to take in the starting card <em>position</em>
-(not starting card number. Because it is 1 indexed, 2019 is at position
-2020)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZmluYWxjYXJkcG9zaXRpb248LWZ1bmN0aW9uKGRlY2tzaXplLGluc3RydWN0aW9ucyxzdHBvKXtcbiAgaTwtMVxuICB3aGlsZShpPD1sZW5ndGgoaW5zdHJ1Y3Rpb25zKSl7XG4gICAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnN0cnVjdGlvbnNbaV0sXCIgXCIpKVxuICAgIGlmKGluc3RbMV09PVwiY3V0XCIpe1xuICAgICAgc3RwbzwtYWZ0ZXJjdXQoZGVja3NpemUsc3Rwbyxhcy5udW1lcmljKGluc3RbMl0pKVxuICAgIH1lbHNlIGlmKGluc3RbMl09PVwiaW50b1wiKXtcbiAgICAgIHN0cG88LWFmdGVybmV3KGRlY2tzaXplLHN0cG8pXG4gICAgfWVsc2UgaWYoaW5zdFsyXT09XCJ3aXRoXCIpe1xuICAgICAgc3RwbzwtYWZ0ZXJpbmMoZGVja3NpemUsc3Rwbyxhcy5udW1lcmljKGluc3RbNF0pKVxuICAgIH1lbHNle2NhdChcIlNvbWV0aW5nIHdlbnQgd3JvbmdcXG5cIil9XG4gICAgaTwtaSsxfVxuICAjIyMgcmVhbGlnbnMgdG8gYmUgMCBpbmRleGVkXG4gIHN0cG99XG5gYGAifQ== -->
-<pre class="r"><code>finalcardposition&lt;-function(decksize,instructions,stpo){
-  i&lt;-1
-  while(i&lt;=length(instructions)){
-    inst&lt;-unlist(str_split(instructions[i],&quot; &quot;))
-    if(inst[1]==&quot;cut&quot;){
-      stpo&lt;-aftercut(decksize,stpo,as.numeric(inst[2]))
-    }else if(inst[2]==&quot;into&quot;){
-      stpo&lt;-afternew(decksize,stpo)
-    }else if(inst[2]==&quot;with&quot;){
-      stpo&lt;-afterinc(decksize,stpo,as.numeric(inst[4]))
-    }else{cat(&quot;Someting went wrong\n&quot;)}
-    i&lt;-i+1}
-  ### realigns to be 0 indexed
-  stpo}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="section" class="section level15">
-<p class="heading"></p>
-<p>Trying one more time using modular arithmetic:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kdHJhbnNmb3JtPC1mdW5jdGlvbihkZWNrc2l6ZSxpbnN0cnVjdGlvbnMpe1xuICBhPC0xXG4gIGI8LTBcbiAgbTwtZGVja3NpemVcbiAgaTwtMVxuICB3aGlsZShpPD1sZW5ndGgoaW5zdHJ1Y3Rpb25zKSl7XG4gICAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnN0cnVjdGlvbnNbaV0sXCIgXCIpKVxuICAgIGlmKGluc3RbMV09PVwiY3V0XCIpe1xuICAgICAgYzwtMVxuICAgICAgZDwtIC1hcy5udW1lcmljKGluc3RbMl0pXG4gICAgfWVsc2UgaWYoaW5zdFsyXT09XCJpbnRvXCIpe1xuICAgICAgYzwtIC0xXG4gICAgICBkPC0gLTFcbiAgICB9ZWxzZSBpZihpbnN0WzJdPT1cIndpdGhcIil7XG4gICAgICBjPC0gYXMubnVtZXJpYyhpbnN0WzRdKVxuICAgICAgZDwtIDBcbiAgICB9ZWxzZXtjYXQoXCJTb21ldGluZyB3ZW50IHdyb25nXFxuXCIpfVxuICAgIGE8LShhKmMpJSVtXG4gICAgYjwtKGIqYytkKSUlbVxuICAgIGk8LWkrMX1cbiAgIyMjIHJlYWxpZ25zIHRvIGJlIDAgaW5kZXhlZFxuICBjKGEsYil9XG5cbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kdHJhbnNmb3JtPC1mdW5jdGlvbihkZWNrc2l6ZSxpbnN0cnVjdGlvbnMpe1xuICBhPC0xXG4gIGI8LTBcbiAgbTwtZGVja3NpemVcbiAgaTwtMVxuICB3aGlsZShpPD1sZW5ndGgoaW5zdHJ1Y3Rpb25zKSl7XG4gICAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnN0cnVjdGlvbnNbaV0sXCIgXCIpKVxuICAgIFxuICAgICMjIyBjdXRcbiAgICBpZihpbnN0WzFdPT1cImN1dFwiKXtcbiAgICAgIGM8LTFcbiAgICAgIGQ8LSAtYXMubnVtZXJpYyhpbnN0WzJdKVxuICAgICMjIyByZXZlcnNlXG4gICAgfWVsc2UgaWYoaW5zdFsyXT09XCJpbnRvXCIpe1xuICAgICAgYzwtIC0xXG4gICAgICBkPC0gLTFcbiAgICAjIyMgZGVhbCB3aXRoIGluY3JlbWVudFxuICAgIH1lbHNlIGlmKGluc3RbMl09PVwid2l0aFwiKXtcbiAgICAgIGM8LSBhcy5udW1lcmljKGluc3RbNF0pXG4gICAgICBkPC0gMFxuICAgIH1lbHNle2NhdChcIlNvbWV0aW5nIHdlbnQgd3JvbmdcXG5cIil9XG4gICAgYTwtKGEqYyklJW1cbiAgICBiPC0oYipjK2QpJSVtXG4gICAgaTwtaSsxfVxuICBjKGEsYil9XG5cbmBgYCJ9 -->
 <pre class="r"><code>modtransform&lt;-function(decksize,instructions){
   a&lt;-1
   b&lt;-0
@@ -1993,12 +1877,16 @@ q</code></pre>
   i&lt;-1
   while(i&lt;=length(instructions)){
     inst&lt;-unlist(str_split(instructions[i],&quot; &quot;))
+    
+    ### cut
     if(inst[1]==&quot;cut&quot;){
       c&lt;-1
       d&lt;- -as.numeric(inst[2])
+    ### reverse
     }else if(inst[2]==&quot;into&quot;){
       c&lt;- -1
       d&lt;- -1
+    ### deal with increment
     }else if(inst[2]==&quot;with&quot;){
       c&lt;- as.numeric(inst[4])
       d&lt;- 0
@@ -2006,12 +1894,12 @@ q</code></pre>
     a&lt;-(a*c)%%m
     b&lt;-(b*c+d)%%m
     i&lt;-i+1}
-  ### realigns to be 0 indexed
   c(a,b)}
 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>For a deck size of 10007, this is the answer:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kdHJhbnNmb3JtKDEwMDA3LGlucHV0KVxuYGBgIn0= -->
@@ -2020,30 +1908,56 @@ q</code></pre>
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdIDkzOTAgNzQ1OVxuIn0= -->
 <pre><code>[1] 9390 7459</code></pre>
 <!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjXG5gYGAifQ== -->
+<pre class="r"><code>###</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>The A is 9390. The B is 7459.</p>
+<p>For a sanity check - this is what the old method gives for the
+position of card 2019 the first 10 shuffles of a 10007 card deck</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxueXI8LTIwMTlcbmZvcihpIGluIDE6MTApe1xueXI8LSg5MzkwKnlyKzc0NTkpJSUxMDAwN1xuY2F0KHlyLFwiXFxuXCIpfVxuYGBgIn0= -->
-<pre class="r"><code>yr&lt;-2019
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucDE8LTA6MTAwMDZcbng8LTIwMTlcbm9sZG1ldGhvZDwtYygpXG5mb3IoaSBpbiAxOjEwKXtcbiAgcDE8LXNodWZmbGVwYXJ0MShwMSxpbnB1dClcbiAgeDwtd2hpY2gocDE9PTIwMTkpLTFcbiAgb2xkbWV0aG9kPC1jKG9sZG1ldGhvZCx4KVxufVxub2xkbWV0aG9kXG5gYGAifQ== -->
+<pre class="r"><code>p1&lt;-0:10006
+x&lt;-2019
+oldmethod&lt;-c()
 for(i in 1:10){
-yr&lt;-(9390*yr+7459)%%10007
-cat(yr,&quot;\n&quot;)}</code></pre>
+  p1&lt;-shufflepart1(p1,input)
+  x&lt;-which(p1==2019)-1
+  oldmethod&lt;-c(oldmethod,x)
+}
+oldmethod</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiMjYwNCBcbjE5MTEgXG45MTk4IFxuNjI2MiBcbjY1MDcgXG41NDQ3IFxuOTAxMiBcbjk0MCBcbjc4ODUgXG41ODE2IFxuIn0= -->
-<pre><code>2604 
-1911 
-9198 
-6262 
-6507 
-5447 
-9012 
-940 
-7885 
-5816 </code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAyNjA0IDE5MTEgOTE5OCA2MjYyIDY1MDcgNTQ0NyA5MDEyICA5NDAgNzg4NSA1ODE2XG4ifQ== -->
+<pre><code> [1] 2604 1911 9198 6262 6507 5447 9012  940 7885 5816</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>And this is what the new method gives</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3JkPC0yMDE5XG5uZXdtZXRob2Q8LWMoKVxuZm9yKGkgaW4gMToxMCl7XG5jcmQ8LSg5MzkwKmNyZCs3NDU5KSUlMTAwMDdcbm5ld21ldGhvZDwtYyhuZXdtZXRob2QsY3JkKX1cbm5ld21ldGhvZFxuYGBgIn0= -->
+<pre class="r"><code>crd&lt;-2019
+newmethod&lt;-c()
+for(i in 1:10){
+crd&lt;-(9390*crd+7459)%%10007
+newmethod&lt;-c(newmethod,crd)}
+newmethod</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAyNjA0IDE5MTEgOTE5OCA2MjYyIDY1MDcgNTQ0NyA5MDEyICA5NDAgNzg4NSA1ODE2XG4ifQ== -->
+<pre><code> [1] 2604 1911 9198 6262 6507 5447 9012  940 7885 5816</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2F0KFwiY29tcGFyZSBvbGQgbWV0aG9kIGFuZCBuZXcgbWV0aG9kOiBcIiwgb2xkbWV0aG9kPT1uZXdtZXRob2QsXCJcXG5cIilcbmBgYCJ9 -->
+<pre class="r"><code>cat(&quot;compare old method and new method: &quot;, oldmethod==newmethod,&quot;\n&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiY29tcGFyZSBvbGQgbWV0aG9kIGFuZCBuZXcgbWV0aG9kOiAgVFJVRSBUUlVFIFRSVUUgVFJVRSBUUlVFIFRSVUUgVFJVRSBUUlVFIFRSVUUgVFJVRSBcbiJ9 -->
+<pre><code>compare old method and new method:  TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>They are the same - so I think that the modular is working.</p>
+<p>This is just the function for composing Ax+B onto Cx+D mod M</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY21wczwtZnVuY3Rpb24oYSxiLGMsZCxtKXtcbiAgYTwtKGEqYyklJW1cbiAgYjwtKChiKmMpK2QpJSVtXG4gIGMoYSxiKX1cbmBgYCJ9 -->
@@ -2054,10 +1968,12 @@ cat(yr,&quot;\n&quot;)}</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>This takes the function Ax+B and raises it to the k (shuffles
+multiple times)</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZWJzPC1mdW5jdGlvbihhLGIsayxkZWNrc2l6ZSx0KXtcbiAgYzwtMVxuICBkPC0wXG4gIHdoaWxlKGs+MCl7XG4gICAgaWYoayUlMj09MSl7XG4gICAgICBnPC1jbXBzKGEsYixjLGQsZGVja3NpemUpXG4gICAgICBjPC1nWzFdXG4gICAgICBkPC1nWzJdfVxuICAgIGs8LWslLyUyXG4gIGY8LWNtcHMoYSxiLGEsYixkZWNrc2l6ZSlcbiAgYTwtZlsxXVxuICBiPC1mWzJdfVxuICBcbiAgY2F0KCgoYyp0KStkKSUlZGVja3NpemUsXCJcXG5cIilcbiAgI2MoYyxkKVxuICBcbiAgKGMqdCtkKSUlZGVja3NpemV9XG5cbmBgYCJ9 -->
-<pre class="r"><code>ebs&lt;-function(a,b,k,decksize,t){
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVsdGlzaHVmZmxlPC1mdW5jdGlvbihhLGIsayxkZWNrc2l6ZSx0KXtcbiAgYzwtMVxuICBkPC0wXG4gIHdoaWxlKGs+MCl7XG4gICAgaWYoayUlMj09MSl7XG4gICAgICBnPC1jbXBzKGEsYixjLGQsZGVja3NpemUpXG4gICAgICBjPC1nWzFdXG4gICAgICBkPC1nWzJdfVxuICAgIGs8LWslLyUyXG4gIGY8LWNtcHMoYSxiLGEsYixkZWNrc2l6ZSlcbiAgYTwtZlsxXVxuICBiPC1mWzJdfVxuICAoYyp0K2QpJSVkZWNrc2l6ZX1cblxuYGBgIn0= -->
+<pre class="r"><code>multishuffle&lt;-function(a,b,k,decksize,t){
   c&lt;-1
   d&lt;-0
   while(k&gt;0){
@@ -2069,108 +1985,121 @@ cat(yr,&quot;\n&quot;)}</code></pre>
   f&lt;-cmps(a,b,a,b,decksize)
   a&lt;-f[1]
   b&lt;-f[2]}
-  
-  cat(((c*t)+d)%%decksize,&quot;\n&quot;)
-  #c(c,d)
-  
   (c*t+d)%%decksize}
 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>And again, using 10007 and card 2019 - this is where it goes for the
+first 10 shuffles</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZWJzKDkzOTAsNzQ1OSwxLDEwMDA3LDIwMTkpXG5gYGAifQ== -->
-<pre class="r"><code>ebs(9390,7459,1,10007,2019)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDI2MDRcbiJ9 -->
-<pre><code>[1] 2604</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucTwtMjAxOVxuZm9yKGkgaW4gMToxMCl7XG4gIHE8LWVicyg5MzkwLDc0NTksaSwxMDAwNywyMDE5KVxuICBjYXQocSxcIlxcblwiKVxufVxuYGBgIn0= -->
-<pre class="r"><code>q&lt;-2019
-for(i in 1:10){
-  q&lt;-ebs(9390,7459,i,10007,2019)
-  cat(q,&quot;\n&quot;)
-}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiMjYwNCBcbjE5MTEgXG45MTk4IFxuNjI2MiBcbjY1MDcgXG41NDQ3IFxuOTAxMiBcbjk0MCBcbjc4ODUgXG41ODE2IFxuIn0= -->
-<pre><code>2604 
-1911 
-9198 
-6262 
-6507 
-5447 
-9012 
-940 
-7885 
-5816 </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYmlnZGVjazwtKDExOTMxNTcxNzUxNDA0NylcbmJpZ3NodWZmbGU8LSgxMDE3NDE1ODIwNzY2NjEpXG5cbmBgYCJ9 -->
-<pre class="r"><code>bigdeck&lt;-(119315717514047)
-bigshuffle&lt;-(101741582076661)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuQUI8LW1vZHRyYW5zZm9ybShiaWdkZWNrLGlucHV0KVxuXG4jIyMgVGhpcyBpcyB0aGUgdHJhbnNmb3JtIG9mIGl0IG9uY2UuXG5cbmJpZ0E8LUFCWzFdXG5iaWdCPC1BQlsyXVxuXG5gYGAifQ== -->
-<pre class="r"><code>AB&lt;-modtransform(bigdeck,input)
-
-### This is the transform of it once.
-
-bigA&lt;-AB[1]
-bigB&lt;-AB[2]
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5lYnMoYmlnQSxiaWdCLGJpZ3NodWZmbGUsYmlnZGVjaywxKVxuXG4jIyMgU28gdGhpcyAtIFxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5tdWx0aXNodWZmbGV2ZXJzaW9uPC1jKClcbmZvcihpIGluIDE6MTApe211bHRpc2h1ZmZsZXZlcnNpb248LWMobXVsdGlzaHVmZmxldmVyc2lvbixtdWx0aXNodWZmbGUoOTM5MCw3NDU5LGksMTAwMDcsMjAxOSkpfVxuXG5tdWx0aXNodWZmbGV2ZXJzaW9uXG5gYGAifQ== -->
 <pre class="r"><code>
-ebs(bigA,bigB,bigshuffle,bigdeck,1)
+multishuffleversion&lt;-c()
+for(i in 1:10){multishuffleversion&lt;-c(multishuffleversion,multishuffle(9390,7459,i,10007,2019))}
 
-### So this - </code></pre>
+multishuffleversion</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAyNjA0IDE5MTEgOTE5OCA2MjYyIDY1MDcgNTQ0NyA5MDEyICA5NDAgNzg4NSA1ODE2XG4ifQ== -->
+<pre><code> [1] 2604 1911 9198 6262 6507 5447 9012  940 7885 5816</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2F0KFwiY29tcGFyZSBuZXcgbWV0aG9kICYgbXVsdGlzaHVmZmxlOiBcIiwgbXVsdGlzaHVmZmxldmVyc2lvbj09bmV3bWV0aG9kLFwiXFxuXCIpXG5gYGAifQ== -->
+<pre class="r"><code>cat(&quot;compare new method &amp; multishuffle: &quot;, multishuffleversion==newmethod,&quot;\n&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiY29tcGFyZSBuZXcgbWV0aG9kICYgbXVsdGlzaHVmZmxlOiAgVFJVRSBUUlVFIFRSVUUgVFJVRSBUUlVFIFRSVUUgVFJVRSBUUlVFIFRSVUUgVFJVRSBcbiJ9 -->
+<pre><code>compare new method &amp; multishuffle:  TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>So this gives the same answer</p>
+<p>BUT!!!!!!!!!!</p>
+<p>The question asks for the card in position 2020, not where 2020 ends
+up. So, it needs the inverse function</p>
+<p>And to find that, you find the inverse of A for that deck size</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIDU0NDg0MDc2MDY4ODY0IDU4NjgwNzk1OTg3OTY4XG5gYGAifQ== -->
-<pre class="r"><code>### 54484076068864 58680795987968</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIEFcbm1vZGludig5MzkwLDEwMDA3KVxuYGBgIn0= -->
+<pre class="r"><code>### A
+modinv(9390,10007)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUxOVxuIn0= -->
+<pre><code>[1] 519</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIEJcbihtb2RpbnYoOTM5MCwxMDAwNykqLTc0NTkpJSUxMDAwN1xuYGBgIn0= -->
+<pre class="r"><code>### B
+(modinv(9390,10007)*-7459)%%10007</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDE0ODhcbiJ9 -->
+<pre><code>[1] 1488</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>SO - I think</p>
-<p>2020=54484076068864 <em>x+58680795987968 (mod 119315717514047)
-2020-58680795987968=54484076068864 </em>x (mod 119315717514047)</p>
-<p>find the modular multiplicative inverse</p>
+<p>So, to find what card was in that position, you can use 519 &amp;
+8519 (with these instructions on a deck of 10007) To show that makes
+sense, try it on the first 10 shuffle positions - all of them should
+return 2019:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kaW52KDU0NDg0MDc2MDY4ODY0LDExOTMxNTcxNzUxNDA0NylcbmBgYCJ9 -->
-<pre class="r"><code>modinv(54484076068864,119315717514047)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2FwcGx5KDE6MTAsZnVuY3Rpb24oeCl7bXVsdGlzaHVmZmxlKDUxOSwxNDg4LHgsMTAwMDcsbXVsdGlzaHVmZmxldmVyc2lvblt4XSl9KVxuYGBgIn0= -->
+<pre class="r"><code>sapply(1:10,function(x){multishuffle(519,1488,x,10007,multishuffleversion[x])})</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAyMDE5IDIwMTkgMjAxOSAyMDE5IDIwMTkgMjAxOSAyMDE5IDIwMTkgMjAxOSAyMDE5XG4ifQ== -->
+<pre><code> [1] 2019 2019 2019 2019 2019 2019 2019 2019 2019 2019</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>(2020-86304683458560)*420286289049=55474871336960*420286289049*x</p>
-<p>Which is 81151119716072</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuKCgyMDIwLTg2MzA0NjgzNDU4NTYwKSo0MjAyODYyODkwNDkpJSUxMTkzMTU3MTc1MTQwNDdcblxuYGBgIn0= -->
-<pre class="r"><code>((2020-86304683458560)*420286289049)%%119315717514047
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>x = 81947887346318</p>
-<p>WHICH IS STILL FUCKING WRONG and technically more wrong than it
-was.</p>
+<p>Exactly as expected.</p>
 <hr />
+<p>So trying this with a really, really, really big deck and a lot of
+shuffles:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubW9kdHJhbnNmb3JtKDExOTMxNTcxNzUxNDA0NyxpbnB1dClcbmBgYCJ9 -->
+<pre class="r"><code>modtransform(119315717514047,input)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdICAyODQ4MDQ0NDk3NDc2MyAxMDQzNDMwMjkwODI1NTNcbiJ9 -->
+<pre><code>[1]  28480444974763 104343029082553</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>A=28480444974763 B=104343029082553</p>
+<p>Invert the A &amp; B:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIEFcbm1vZGludigyODQ4MDQ0NDk3NDc2MywxMTkzMTU3MTc1MTQwNDcpXG5gYGAifQ== -->
+<pre class="r"><code>### A
+modinv(28480444974763,119315717514047)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDgyNjc1OTQ4NzE5OTMxXG4ifQ== -->
+<pre><code>[1] 82675948719931</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIEJcbihtb2RpbnYoMjg0ODA0NDQ5NzQ3NjMsMTE5MzE1NzE3NTE0MDQ3KSotMTA0MzQzMDI5MDgyNTUzKSUlMTE5MzE1NzE3NTE0MDQ3XG5gYGAifQ== -->
+<pre class="r"><code>### B
+(modinv(28480444974763,119315717514047)*-104343029082553)%%119315717514047</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDc5MTg4NDU5NTIwMFxuIn0= -->
+<pre><code>[1] 791884595200</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>And run that through multishuffle:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVsdGlzaHVmZmxlKDgyNjc1OTQ4NzE5OTMxLDc5MTg4NDU5NTIwMCwxMDE3NDE1ODIwNzY2NjEsMTE5MzE1NzE3NTE0MDQ3LDIwMjApXG5gYGAifQ== -->
+<pre class="r"><code>multishuffle(82675948719931,791884595200,101741582076661,119315717514047,2020)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDMxODI0MDQyOTIyOTA5XG4ifQ== -->
+<pre><code>[1] 31824042922909</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="and-thats-the-wrong-answer" class="section level2">
+<h2>AND THAT’S THE WRONG ANSWER</h2>
+<p>So, trying this backwards:</p>
+<p>This function does the reverse of everything. It cuts backwards, it
+reverses (which is the same either way), it deals into backwards.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW52ZXJzdHJhbnM8LWZ1bmN0aW9uKGRlY2tzaXplLGluc3RydWN0aW9ucyl7XG4gIGE8LTFcbiAgYjwtMFxuICBtPC1kZWNrc2l6ZVxuICBpPC0xXG4gIHdoaWxlKGk8PWxlbmd0aChpbnN0cnVjdGlvbnMpKXtcbiAgICBpbnN0PC11bmxpc3Qoc3RyX3NwbGl0KGluc3RydWN0aW9uc1tpXSxcIiBcIikpXG4gICAgaWYoaW5zdFsxXT09XCJjdXRcIil7XG4gICAgICBjPC0xXG4gICAgICBkPC0gLWFzLm51bWVyaWMoaW5zdFsyXSlcbiAgICB9ZWxzZSBpZihpbnN0WzJdPT1cImludG9cIil7XG4gICAgICBjPC0gLTFcbiAgICAgIGQ8LSAtMVxuICAgIH1lbHNlIGlmKGluc3RbMl09PVwid2l0aFwiKXtcbiAgICAgIGM8LSBhcy5udW1lcmljKGluc3RbNF0pXG4gICAgICBkPC0gMFxuICAgIH1lbHNle2NhdChcIlNvbWV0aW5nIHdlbnQgd3JvbmdcXG5cIil9XG4gICAgIyMjIGludmVydCBpdFxuICAgIGludmM8LW1vZGludihjLG0pJSVtXG4gICAgaW52ZDwtICgtZCptb2RpbnYoYyxtKSklJW1cbiAgICAjIyNcbiAgICBhPC0oYSppbnZjKSUlbVxuICAgIGI8LShiKmludmMraW52ZCklJW1cbiAgICBpPC1pKzF9XG4gICMjIyByZWFsaWducyB0byBiZSAwIGluZGV4ZWRcbiAgYyhhLGIpfVxuYGBgIn0= -->
@@ -2203,21 +2132,7 @@ was.</p>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW52ZXJzdHJhbnMoMTE5MzE1NzE3NTE0MDQ3LHJldihpbnB1dCkpXG5cbiMjIyAxIHRyYW5zZm9ybVxuXG5gYGAifQ== -->
-<pre class="r"><code>inverstrans(119315717514047,rev(input))
-
-### 1 transform
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZWJzKDQzMDE4MjU4MjE5MDA4LDMzMTQzNzI1NzYxMzIyLGJpZ3NodWZmbGUsMTAwMDcsMjAyMClcbmBgYCJ9 -->
-<pre class="r"><code>ebs(43018258219008,33143725761322,bigshuffle,10007,2020)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
+<p>Again showing that it works with 10007</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW52ZXJzdHJhbnMoMTAwMDcscmV2KGlucHV0KSlcbmBgYCJ9 -->
@@ -2226,110 +2141,11 @@ was.</p>
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdICA1MTkgMTQ4OFxuIn0= -->
 <pre><code>[1]  519 1488</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIDEgdHJhbnNmb3JtXG5cbmBgYCJ9 -->
-<pre class="r"><code>### 1 transform
-</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZWJzKDI4NDgwNDQ0OTc0NzYzLDEwNDM0MzAyOTA4MjU1MyxiaWdzaHVmZmxlLGJpZ2RlY2ssMSlcbmBgYCJ9 -->
-<pre class="r"><code>ebs(28480444974763,104343029082553,bigshuffle,bigdeck,1)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiNTQ0ODQwNzYwNjg4NjQgNTg2ODA3OTU5ODc5NjggXG5bMV0gMTEzMTY0ODcyMDU2ODMyXG4ifQ== -->
-<pre><code>54484076068864 58680795987968 
-[1] 113164872056832</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYTwtc2FtcGxlKDE6MTAwMDcsMjApXG5cbmI8LXNhcHBseShhLGZ1bmN0aW9uKHgpe1xuICBlYnMoOTM5MCw3NDU5LHgsMTAwMDcsMjAxOSlcbn0pXG5gYGAifQ== -->
-<pre class="r"><code>a&lt;-sample(1:10007,20)
-
-b&lt;-sapply(a,function(x){
-  ebs(9390,7459,x,10007,2019)
-})</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiMTgyNyBcbjczNjUgXG42NDQ2IFxuMzQ5OCBcbjgxODUgXG4xMTA0IFxuNDkyNSBcbjgzMDQgXG43Mjg0IFxuMzc2OCBcbjQzMjAgXG45ODcgXG43NTcwIFxuNTQzNiBcbjUyMzkgXG43MTQxIFxuMjY3NCBcbjczMTIgXG44NjUyIFxuNDU4MSBcbiJ9 -->
-<pre><code>1827 
-7365 
-6446 
-3498 
-8185 
-1104 
-4925 
-8304 
-7284 
-3768 
-4320 
-987 
-7570 
-5436 
-5239 
-7141 
-2674 
-7312 
-8652 
-4581 </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYlxuYGBgIn0= -->
-<pre class="r"><code>b</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAxODI3IDczNjUgNjQ0NiAzNDk4IDgxODUgMTEwNCA0OTI1IDgzMDQgNzI4NCAzNzY4IDQzMjAgIDk4NyA3NTcwIDU0MzYgNTIzOSA3MTQxIDI2NzRcblsxOF0gNzMxMiA4NjUyIDQ1ODFcbiJ9 -->
-<pre><code> [1] 1827 7365 6446 3498 8185 1104 4925 8304 7284 3768 4320  987 7570 5436 5239 7141 2674
-[18] 7312 8652 4581</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGxsPC1zYXBwbHkoMToyMCxmdW5jdGlvbih4KXtcbiAgZWJzKDUxOSwxNDg4LGFbeF0sMTAwMDcsYlt4XSlcbn0pXG5gYGAifQ== -->
-<pre class="r"><code>lll&lt;-sapply(1:20,function(x){
-  ebs(519,1488,a[x],10007,b[x])
-})</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiMjAxOSBcbjIwMTkgXG4yMDE5IFxuMjAxOSBcbjIwMTkgXG4yMDE5IFxuMjAxOSBcbjIwMTkgXG4yMDE5IFxuMjAxOSBcbjIwMTkgXG4yMDE5IFxuMjAxOSBcbjIwMTkgXG4yMDE5IFxuMjAxOSBcbjIwMTkgXG4yMDE5IFxuMjAxOSBcbjIwMTkgXG4ifQ== -->
-<pre><code>2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 
-2019 </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGxsXG5gYGAifQ== -->
-<pre class="r"><code>lll</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAyMDE5IDIwMTkgMjAxOSAyMDE5IDIwMTkgMjAxOSAyMDE5IDIwMTkgMjAxOSAyMDE5IDIwMTkgMjAxOSAyMDE5IDIwMTkgMjAxOSAyMDE5IDIwMTlcblsxOF0gMjAxOSAyMDE5IDIwMTlcbiJ9 -->
-<pre><code> [1] 2019 2019 2019 2019 2019 2019 2019 2019 2019 2019 2019 2019 2019 2019 2019 2019 2019
-[18] 2019 2019 2019</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGFyZ2VkZWNrPC1hcy5pbnRlZ2VyNjQoMTE5MzE1NzE3NTE0MDQ3KVxubGFyZ2VzaHVmZmxlPC1hcy5pbnRlZ2VyNjQoMTAxNzQxNTgyMDc2NjYxKVxuYGBgIn0= -->
-<pre class="r"><code>largedeck&lt;-as.integer64(119315717514047)
-largeshuffle&lt;-as.integer64(101741582076661)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYTwtc2FtcGxlKDE6NTAwMCwyMClcbmBgYCJ9 -->
-<pre class="r"><code>a&lt;-sample(1:5000,20)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
+<p>And those numbers may look familiar - because they’re the same as
+above. And so it’s clear that this should work</p>
+<p>On the really big deck:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW52ZXJzdHJhbnMoMTE5MzE1NzE3NTE0MDQ3LHJldihpbnB1dCkpXG5gYGAifQ== -->
@@ -2338,93 +2154,25 @@ largeshuffle&lt;-as.integer64(101741582076661)</code></pre>
 <!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQzMDE4MjU4MjE5MDA4IDMzMTQzNzI1NzYxMzIyXG4ifQ== -->
 <pre><code>[1] 43018258219008 33143725761322</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIDEgdHJhbnNmb3JtXG5cbmBgYCJ9 -->
-<pre class="r"><code>### 1 transform
-</code></pre>
-<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>Those are different numbers than above, but maybe they’ll work.</p>
+<p>run through multishuffle:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYjwtc2FwcGx5KGEsZnVuY3Rpb24oeCl7XG4gIGVicyg1NDQ4NDA3NjA2ODg2NCw1ODY4MDc5NTk4Nzk2OCx4LDExOTMxNTcxNzUxNDA0NywyMDE5KVxufSlcbmBgYCJ9 -->
-<pre class="r"><code>b&lt;-sapply(a,function(x){
-  ebs(54484076068864,58680795987968,x,119315717514047,2019)
-})</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVsdGlzaHVmZmxlKDQzMDE4MjU4MjE5MDA4LDMzMTQzNzI1NzYxMzIyLDEwMTc0MTU4MjA3NjY2MSwxMTkzMTU3MTc1MTQwNDcsMjAyMClcbmBgYCJ9 -->
+<pre class="r"><code>multishuffle(43018258219008,33143725761322,101741582076661,119315717514047,2020)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiMjkzNzE4MTM2NTM0MjIgXG43NjQzMTczMjY2MjE1OSBcbjM4NjM1MjA1MjM5MjQ4IFxuNTkyNTU3ODY2NzczMCBcbjQ4NDAzMzg3OTc1MDU4IFxuMjk3MzI5OTE5MjM3MDEgXG4zMjcyNzc1NDg5NzM3NyBcbjkyNTI2ODA3NDM4MzAgXG4xMTY3NzUxNzYyMjM4MzkgXG44NTgxMDY5NjQ3NDM5OSBcbjEwNzY5MjExMDIzMzIzMyBcbjU1NDc0MTEwNDU1NzYgXG4xMTMzODAwNTIxNjA5OTAgXG4xNzY4NjMwNDYzNzAwMyBcbjEwNTE1MzMxNzM3NzIyNiBcbjQ1NzA5ODE3Mzg4NzY3IFxuODgwNTY0MjUyNTM1MTcgXG44Mjk5NDU1OTQ4MjA2NiBcbjMwNzI0MTQxMTQ4OTQgXG44OTE5MzQyNjM4MjUwNSBcbiJ9 -->
-<pre><code>29371813653422 
-76431732662159 
-38635205239248 
-5925578667730 
-48403387975058 
-29732991923701 
-32727754897377 
-9252680743830 
-116775176223839 
-85810696474399 
-107692110233233 
-5547411045576 
-113380052160990 
-17686304637003 
-105153317377226 
-45709817388767 
-88056425253517 
-82994559482066 
-3072414114894 
-89193426382505 </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYlxuYGBgIn0= -->
-<pre class="r"><code>b</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAgMjkzNzE4MTM2NTM0MjIgIDc2NDMxNzMyNjYyMTU5ICAzODYzNTIwNTIzOTI0OCAgIDU5MjU1Nzg2Njc3MzAgIDQ4NDAzMzg3OTc1MDU4XG4gWzZdICAyOTczMjk5MTkyMzcwMSAgMzI3Mjc3NTQ4OTczNzcgICA5MjUyNjgwNzQzODMwIDExNjc3NTE3NjIyMzgzOSAgODU4MTA2OTY0NzQzOTlcblsxMV0gMTA3NjkyMTEwMjMzMjMzICAgNTU0NzQxMTA0NTU3NiAxMTMzODAwNTIxNjA5OTAgIDE3Njg2MzA0NjM3MDAzIDEwNTE1MzMxNzM3NzIyNlxuWzE2XSAgNDU3MDk4MTczODg3NjcgIDg4MDU2NDI1MjUzNTE3ICA4Mjk5NDU1OTQ4MjA2NiAgIDMwNzI0MTQxMTQ4OTQgIDg5MTkzNDI2MzgyNTA1XG4ifQ== -->
-<pre><code> [1]  29371813653422  76431732662159  38635205239248   5925578667730  48403387975058
- [6]  29732991923701  32727754897377   9252680743830 116775176223839  85810696474399
-[11] 107692110233233   5547411045576 113380052160990  17686304637003 105153317377226
-[16]  45709817388767  88056425253517  82994559482066   3072414114894  89193426382505</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGxsPC1zYXBwbHkoMToyMCxmdW5jdGlvbih4KXtcbiAgZWJzKDQzMDE4MjU4MjE5MDA4LDMzMTQzNzI1NzYxMzIyLGFbeF0sMTE5MzE1NzE3NTE0MDQ3LGJbeF0pXG59KVxuYGBgIn0= -->
-<pre class="r"><code>lll&lt;-sapply(1:20,function(x){
-  ebs(43018258219008,33143725761322,a[x],119315717514047,b[x])
-})</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiOTc3MDExMTA3NDMwNDAgXG41MjA5NTUzNzM4MTM3NiBcbjE5Nzg0NzY2ODQ5MDI0IFxuOTA4MDE5OTIzNjgxMjggXG43MjI3MTU0ODkwNzUyMCBcbjczNjEyMDgyMDIwMzUyIFxuMTE3ODUyNTYwNDI0OTYwIFxuOTU0NjYwNTAwMjc1MjAgXG44MDAwODI2MTQwMjYyNCBcbjg1OTMyMzYzNDgxMDg4IFxuMTAzMDA4ODg1MDE0NTI4IFxuODc2MzExNTcyNjQzODQgXG40NjAwNzY4OTY3NDc1MiBcbjEwNTI4ODU3MzEyNDYwOCBcbjYxMjQ5NTg5MDg0MTYwIFxuNjQ2OTk2NTU3ODI0MDAgXG4yOTY2MTU4MTAxNzA4OCBcbjkxMzIxNzQyMTMxMjAgXG4yMDM5MjgwNjcxMTI5NiBcbjIzMDI3MTk4NzIyMDQ4IFxuIn0= -->
-<pre><code>97701110743040 
-52095537381376 
-19784766849024 
-90801992368128 
-72271548907520 
-73612082020352 
-117852560424960 
-95466050027520 
-80008261402624 
-85932363481088 
-103008885014528 
-87631157264384 
-46007689674752 
-105288573124608 
-61249589084160 
-64699655782400 
-29661581017088 
-9132174213120 
-20392806711296 
-23027198722048 </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGxsXG5gYGAifQ== -->
-<pre class="r"><code>lll</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSAgOTc3MDExMTA3NDMwNDAgIDUyMDk1NTM3MzgxMzc2ICAxOTc4NDc2Njg0OTAyNCAgOTA4MDE5OTIzNjgxMjggIDcyMjcxNTQ4OTA3NTIwXG4gWzZdICA3MzYxMjA4MjAyMDM1MiAxMTc4NTI1NjA0MjQ5NjAgIDk1NDY2MDUwMDI3NTIwICA4MDAwODI2MTQwMjYyNCAgODU5MzIzNjM0ODEwODhcblsxMV0gMTAzMDA4ODg1MDE0NTI4ICA4NzYzMTE1NzI2NDM4NCAgNDYwMDc2ODk2NzQ3NTIgMTA1Mjg4NTczMTI0NjA4ICA2MTI0OTU4OTA4NDE2MFxuWzE2XSAgNjQ2OTk2NTU3ODI0MDAgIDI5NjYxNTgxMDE3MDg4ICAgOTEzMjE3NDIxMzEyMCAgMjAzOTI4MDY3MTEyOTYgIDIzMDI3MTk4NzIyMDQ4XG4ifQ== -->
-<pre><code> [1]  97701110743040  52095537381376  19784766849024  90801992368128  72271548907520
- [6]  73612082020352 117852560424960  95466050027520  80008261402624  85932363481088
-[11] 103008885014528  87631157264384  46007689674752 105288573124608  61249589084160
-[16]  64699655782400  29661581017088   9132174213120  20392806711296  23027198722048</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDc4NDUyNjI1MzE4Nzk0XG4ifQ== -->
+<pre><code>[1] 78452625318794</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>which is still the wrong answer.</p>
 <!-- rnb-text-end -->
 </div>
-</div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAyMiBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShiaXQ2NCkNCmxpYnJhcnkobnVtYmVycykNCmxpYnJhcnkocmVzaGFwZTIpDQpsaWJyYXJ5KGtuaXRyKQ0KbGlicmFyeShkcGx5cikNCmxpYnJhcnkoc3RyaW5ncikNCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShyZWFkcikNCmxpYnJhcnkoY29sbGVjdGlvbnMpDQpvcHRpb25zKHNjaXBlbiA9IDk5OSkNCmBgYA0KDQpgYGB7cn0NCmlucHV0PC1yZWFkX2xpbmVzKCIuLi8uLi9Bb0NEYXRhL0FPQzIwMTkvRGF5MjIudHh0IikNCmBgYA0KDQoNCmBgYHtyfQ0KbmV3c3RhY2s8LWZ1bmN0aW9uKGQpew0KICByZXYoZCl9DQpgYGANCg0KYGBge3J9DQpjdXRkZWNrPC1mdW5jdGlvbihkLG4pew0KICBuPC1uJSVsZW5ndGgoZCkNCiAgb3V0ZGVjazwtZA0KICBvdXRkZWNrPC1jKGRbLWMoMTpuKV0sZFtjKDE6bildKQ0KICBvdXRkZWNrfQ0KYGBgDQoNCmBgYHtyfQ0KY3V0ZGVjaygwOjksMykNCmBgYA0KYGBge3J9DQpkd2k8LWZ1bmN0aW9uKGQsbil7DQogIG91dGRlY2s8LWMoKQ0KICBmb3IoaSBpbiAxOmxlbmd0aChkKSl7DQogICAgeDwtKChpLTEpKm4rMSklJWxlbmd0aChkKQ0KICAgIGlmKHg9PTApe3g8LWxlbmd0aChkKX0NCiAgICBvdXRkZWNrW3hdPC1kW2ldfQ0KICBvdXRkZWNrfQ0KYGBgDQoNCmBgYHtyfQ0KZHdpKDA6OSwzKQ0KYGBgDQpgYGB7cn0NCmN1dGRlY2soZHdpKGR3aSgwOjksNyksOSksLTIpDQpgYGANCmBgYHtyfQ0Kc2h1ZmZsZXBhcnQxPC1mdW5jdGlvbihkLGluc3RydWN0aW9ucyl7DQogIGk8LTENCiAgd2hpbGUoaTw9bGVuZ3RoKGluc3RydWN0aW9ucykpew0KICAgIGluc3Q8LXVubGlzdChzdHJfc3BsaXQoaW5zdHJ1Y3Rpb25zW2ldLCIgIikpDQogICAjIGNhdChpbnN0LCJcbiIpDQogICAgaWYoaW5zdFsxXT09ImN1dCIpew0KICAgICAgZDwtY3V0ZGVjayhkLGFzLm51bWVyaWMoaW5zdFsyXSkpDQogICAgfWVsc2UgaWYoaW5zdFsyXT09ImludG8iKXsNCiAgICAgIGQ8LW5ld3N0YWNrKGQpDQogICAgfWVsc2UgaWYoaW5zdFsyXT09IndpdGgiKXsNCiAgICAgIGQ8LWR3aShkLGFzLm51bWVyaWMoaW5zdFs0XSkpDQogICAgfWVsc2V7Y2F0KCJTb21ldGluZyB3ZW50IHdyb25nXG4iKX0NCiAgICBpPC1pKzF9DQogIGR9DQpgYGANCg0KYGBge3J9DQpwMTwtc2h1ZmZsZXBhcnQxKDA6MTAwMDYsaW5wdXQpDQpwYXJ0MTwtd2hpY2gocDE9PTIwMTkpLTENCnBhcnQxDQoNCmBgYA0KDQpgYGB7cn0NCnAxPC0wOjEwMDA2DQp4PC0yMDE5DQpmb3IoaSBpbiAxOjEwKXsNCiAgcDE8LXNodWZmbGVwYXJ0MShwMSxpbnB1dCkNCiAgeDwtd2hpY2gocDE9PTIwMTkpLTENCiAgY2F0KHgsIlxuIikNCn0NCmBgYA0KDQoNCg0KIyMgUGFydCAyIC0gDQoNCkNhbid0IGJydXRlIGl0IC0gc28NCg0KDQpXaGVyZSBkbyB0aGluZ3MgZ286DQoNCg0KYGBge3J9DQphZnRlcmN1dDwtZnVuY3Rpb24oZGVja3NpemUsc3Rwb3Msbil7DQogIGVuZHBvczwtKHN0cG9zLW4pJSVkZWNrc2l6ZQ0KICBpZihlbmRwb3M9PTApe2VuZHBvczwtZGVja3NpemV9DQogIGVuZHBvc30NCg0KDQpgYGANCg0KDQpgYGB7cn0NCmFmdGVyY3V0KDEwLDEsMykNCnE8LXNhcHBseSgxOjEwLGZ1bmN0aW9uKHgpe2FmdGVyY3V0KDEwLHgsLTQpfSkNCigwOjEwKVtvcmRlcihxKV0NCg0KYGBgDQoNCmBgYHtyfQ0KYWZ0ZXJuZXc8LWZ1bmN0aW9uKGRlY2tzaXplLHN0cG9zKXsNCiAgZW5kcG9zPC1kZWNrc2l6ZSsxLXN0cG9zDQogIGVuZHBvc30NCmBgYA0KDQpgYGB7cn0NCnE8LXNhcHBseSgxOjEwLGZ1bmN0aW9uKHgpe2FmdGVybmV3KDEwLHgpfSkNCigwOjEwKVtvcmRlcihxKV0NCg0KDQpgYGANCg0KYGBge3J9DQphZnRlcmluYzwtZnVuY3Rpb24oZGVja3NpemUsc3Rwb3Msbil7DQogIGVuZHBvczwtKCgoc3Rwb3MtMSkqbikrMSklJWRlY2tzaXplDQogIGlmKGVuZHBvcz09MCl7ZW5kcG9zPC1kZWNrc2l6ZX0NCiAgZW5kcG9zfQ0KYGBgDQoNCg0KDQoNCg0KYGBge3J9DQpxPC1zYXBwbHkoMToxMCxmdW5jdGlvbih4KXthZnRlcmluYygxMCx4LDMpfSkNCnENCmBgYA0KYGBge3J9DQooMDoxMClbb3JkZXIocSldDQpgYGANCg0KDQpUaGlzIHVzZXMgdGhlIGFib3ZlIHRvIHRha2UgaW4gdGhlIHN0YXJ0aW5nIGNhcmQgKnBvc2l0aW9uKiAobm90IHN0YXJ0aW5nIGNhcmQgbnVtYmVyLiAgQmVjYXVzZSBpdCBpcyAxIGluZGV4ZWQsIDIwMTkgaXMgYXQgcG9zaXRpb24gMjAyMCkNCmBgYHtyfQ0KZmluYWxjYXJkcG9zaXRpb248LWZ1bmN0aW9uKGRlY2tzaXplLGluc3RydWN0aW9ucyxzdHBvKXsNCiAgaTwtMQ0KICB3aGlsZShpPD1sZW5ndGgoaW5zdHJ1Y3Rpb25zKSl7DQogICAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnN0cnVjdGlvbnNbaV0sIiAiKSkNCiAgICBpZihpbnN0WzFdPT0iY3V0Iil7DQogICAgICBzdHBvPC1hZnRlcmN1dChkZWNrc2l6ZSxzdHBvLGFzLm51bWVyaWMoaW5zdFsyXSkpDQogICAgfWVsc2UgaWYoaW5zdFsyXT09ImludG8iKXsNCiAgICAgIHN0cG88LWFmdGVybmV3KGRlY2tzaXplLHN0cG8pDQogICAgfWVsc2UgaWYoaW5zdFsyXT09IndpdGgiKXsNCiAgICAgIHN0cG88LWFmdGVyaW5jKGRlY2tzaXplLHN0cG8sYXMubnVtZXJpYyhpbnN0WzRdKSkNCiAgICB9ZWxzZXtjYXQoIlNvbWV0aW5nIHdlbnQgd3JvbmdcbiIpfQ0KICAgIGk8LWkrMX0NCiAgIyMjIHJlYWxpZ25zIHRvIGJlIDAgaW5kZXhlZA0KICBzdHBvfQ0KYGBgDQoNCg0KIyMjIyMjIyMjIyMjIyMjDQpUcnlpbmcgb25lIG1vcmUgdGltZSB1c2luZyBtb2R1bGFyIGFyaXRobWV0aWM6DQoNCmBgYHtyfQ0KbW9kdHJhbnNmb3JtPC1mdW5jdGlvbihkZWNrc2l6ZSxpbnN0cnVjdGlvbnMpew0KICBhPC0xDQogIGI8LTANCiAgbTwtZGVja3NpemUNCiAgaTwtMQ0KICB3aGlsZShpPD1sZW5ndGgoaW5zdHJ1Y3Rpb25zKSl7DQogICAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnN0cnVjdGlvbnNbaV0sIiAiKSkNCiAgICBpZihpbnN0WzFdPT0iY3V0Iil7DQogICAgICBjPC0xDQogICAgICBkPC0gLWFzLm51bWVyaWMoaW5zdFsyXSkNCiAgICB9ZWxzZSBpZihpbnN0WzJdPT0iaW50byIpew0KICAgICAgYzwtIC0xDQogICAgICBkPC0gLTENCiAgICB9ZWxzZSBpZihpbnN0WzJdPT0id2l0aCIpew0KICAgICAgYzwtIGFzLm51bWVyaWMoaW5zdFs0XSkNCiAgICAgIGQ8LSAwDQogICAgfWVsc2V7Y2F0KCJTb21ldGluZyB3ZW50IHdyb25nXG4iKX0NCiAgICBhPC0oYSpjKSUlbQ0KICAgIGI8LShiKmMrZCklJW0NCiAgICBpPC1pKzF9DQogICMjIyByZWFsaWducyB0byBiZSAwIGluZGV4ZWQNCiAgYyhhLGIpfQ0KDQpgYGANCg0KDQpgYGB7cn0NCm1vZHRyYW5zZm9ybSgxMDAwNyxpbnB1dCkNCmBgYA0KDQoNCmBgYHtyfQ0KeXI8LTIwMTkNCmZvcihpIGluIDE6MTApew0KeXI8LSg5MzkwKnlyKzc0NTkpJSUxMDAwNw0KY2F0KHlyLCJcbiIpfQ0KYGBgDQoNCmBgYHtyfQ0KY21wczwtZnVuY3Rpb24oYSxiLGMsZCxtKXsNCiAgYTwtKGEqYyklJW0NCiAgYjwtKChiKmMpK2QpJSVtDQogIGMoYSxiKX0NCmBgYA0KDQpgYGB7cn0NCmViczwtZnVuY3Rpb24oYSxiLGssZGVja3NpemUsdCl7DQogIGM8LTENCiAgZDwtMA0KICB3aGlsZShrPjApew0KICAgIGlmKGslJTI9PTEpew0KICAgICAgZzwtY21wcyhhLGIsYyxkLGRlY2tzaXplKQ0KICAgICAgYzwtZ1sxXQ0KICAgICAgZDwtZ1syXX0NCiAgICBrPC1rJS8lMg0KICBmPC1jbXBzKGEsYixhLGIsZGVja3NpemUpDQogIGE8LWZbMV0NCiAgYjwtZlsyXX0NCiAgDQogIGNhdCgoKGMqdCkrZCklJWRlY2tzaXplLCJcbiIpDQogICNjKGMsZCkNCiAgDQogIChjKnQrZCklJWRlY2tzaXplfQ0KDQpgYGANCg0KDQoNCmBgYHtyfQ0KZWJzKDkzOTAsNzQ1OSwxLDEwMDA3LDIwMTkpDQoNCnE8LTIwMTkNCmZvcihpIGluIDE6MTApew0KICBxPC1lYnMoOTM5MCw3NDU5LGksMTAwMDcsMjAxOSkNCiAgY2F0KHEsIlxuIikNCn0NCg0KDQoNCmBgYA0KDQpgYGB7cn0NCmJpZ2RlY2s8LSgxMTkzMTU3MTc1MTQwNDcpDQpiaWdzaHVmZmxlPC0oMTAxNzQxNTgyMDc2NjYxKQ0KDQpgYGANCg0KDQoNCg0KYGBge3J9DQpBQjwtbW9kdHJhbnNmb3JtKGJpZ2RlY2ssaW5wdXQpDQoNCiMjIyBUaGlzIGlzIHRoZSB0cmFuc2Zvcm0gb2YgaXQgb25jZS4NCg0KYmlnQTwtQUJbMV0NCmJpZ0I8LUFCWzJdDQoNCmBgYA0KDQpgYGB7cn0NCg0KZWJzKGJpZ0EsYmlnQixiaWdzaHVmZmxlLGJpZ2RlY2ssMSkNCg0KIyMjIFNvIHRoaXMgLSANCmBgYA0KDQpgYGB7cn0NCiMjIyA1NDQ4NDA3NjA2ODg2NCA1ODY4MDc5NTk4Nzk2OA0KYGBgDQoNCg0KU08gLSBJIHRoaW5rDQoNCjIwMjA9NTQ0ODQwNzYwNjg4NjQgKngrNTg2ODA3OTU5ODc5NjggKG1vZCAxMTkzMTU3MTc1MTQwNDcpDQoyMDIwLTU4NjgwNzk1OTg3OTY4PTU0NDg0MDc2MDY4ODY0ICp4IChtb2QgMTE5MzE1NzE3NTE0MDQ3KQ0KDQpmaW5kIHRoZSBtb2R1bGFyIG11bHRpcGxpY2F0aXZlIGludmVyc2UNCg0KYGBge3J9DQptb2RpbnYoNTQ0ODQwNzYwNjg4NjQsMTE5MzE1NzE3NTE0MDQ3KQ0KYGBgDQooMjAyMC04NjMwNDY4MzQ1ODU2MClcKjQyMDI4NjI4OTA0OT01NTQ3NDg3MTMzNjk2MFwqNDIwMjg2Mjg5MDQ5XCp4DQoNCg0KV2hpY2ggaXMgIDgxMTUxMTE5NzE2MDcyDQoNCg0KYGBge3J9DQooKDIwMjAtODYzMDQ2ODM0NTg1NjApKjQyMDI4NjI4OTA0OSklJTExOTMxNTcxNzUxNDA0Nw0KDQpgYGANCnggPSA4MTk0Nzg4NzM0NjMxOA0KDQpXSElDSCBJUyBTVElMTCBGVUNLSU5HIFdST05HIGFuZCB0ZWNobmljYWxseSBtb3JlIHdyb25nIHRoYW4gaXQgd2FzLg0KDQoNCg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KDQpgYGB7cn0NCmludmVyc3RyYW5zPC1mdW5jdGlvbihkZWNrc2l6ZSxpbnN0cnVjdGlvbnMpew0KICBhPC0xDQogIGI8LTANCiAgbTwtZGVja3NpemUNCiAgaTwtMQ0KICB3aGlsZShpPD1sZW5ndGgoaW5zdHJ1Y3Rpb25zKSl7DQogICAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnN0cnVjdGlvbnNbaV0sIiAiKSkNCiAgICBpZihpbnN0WzFdPT0iY3V0Iil7DQogICAgICBjPC0xDQogICAgICBkPC0gLWFzLm51bWVyaWMoaW5zdFsyXSkNCiAgICB9ZWxzZSBpZihpbnN0WzJdPT0iaW50byIpew0KICAgICAgYzwtIC0xDQogICAgICBkPC0gLTENCiAgICB9ZWxzZSBpZihpbnN0WzJdPT0id2l0aCIpew0KICAgICAgYzwtIGFzLm51bWVyaWMoaW5zdFs0XSkNCiAgICAgIGQ8LSAwDQogICAgfWVsc2V7Y2F0KCJTb21ldGluZyB3ZW50IHdyb25nXG4iKX0NCiAgICAjIyMgaW52ZXJ0IGl0DQogICAgaW52YzwtbW9kaW52KGMsbSklJW0NCiAgICBpbnZkPC0gKC1kKm1vZGludihjLG0pKSUlbQ0KICAgICMjIw0KICAgIGE8LShhKmludmMpJSVtDQogICAgYjwtKGIqaW52YytpbnZkKSUlbQ0KICAgIGk8LWkrMX0NCiAgIyMjIHJlYWxpZ25zIHRvIGJlIDAgaW5kZXhlZA0KICBjKGEsYil9DQpgYGANCg0KDQoNCmBgYHtyfQ0KaW52ZXJzdHJhbnMoMTE5MzE1NzE3NTE0MDQ3LHJldihpbnB1dCkpDQoNCiMjIyAxIHRyYW5zZm9ybQ0KDQpgYGANCmBgYHtyfQ0KZWJzKDQzMDE4MjU4MjE5MDA4LDMzMTQzNzI1NzYxMzIyLGJpZ3NodWZmbGUsMTAwMDcsMjAyMCkNCmBgYA0KDQoNCmBgYHtyfQ0KaW52ZXJzdHJhbnMoMTAwMDcscmV2KGlucHV0KSkNCg0KIyMjIDEgdHJhbnNmb3JtDQoNCmBgYA0KDQoNCg0KDQoNCmBgYHtyfQ0KZWJzKDU0NDg0MDc2MDY4ODY0LDU4NjgwNzk1OTg3OTY4LGJpZ3NodWZmbGUsYmlnZGVjaywxKQ0KYGBgDQpgYGB7cn0NCmE8LXNhbXBsZSgxOjEwMDA3LDIwKQ0KDQpiPC1zYXBwbHkoYSxmdW5jdGlvbih4KXsNCiAgZWJzKDkzOTAsNzQ1OSx4LDEwMDA3LDIwMTkpDQp9KQ0KYg0KDQpsbGw8LXNhcHBseSgxOjIwLGZ1bmN0aW9uKHgpew0KICBlYnMoNTE5LDE0ODgsYVt4XSwxMDAwNyxiW3hdKQ0KfSkNCmxsbA0KYGBgDQoNCg0KDQpgYGB7cn0NCmxhcmdlZGVjazwtYXMuaW50ZWdlcjY0KDExOTMxNTcxNzUxNDA0NykNCmxhcmdlc2h1ZmZsZTwtYXMuaW50ZWdlcjY0KDEwMTc0MTU4MjA3NjY2MSkNCmBgYA0KDQoNCmBgYHtyfQ0KYTwtc2FtcGxlKDE6NTAwMCwyMCkNCmBgYA0KDQoNCg0KYGBge3J9DQppbnZlcnN0cmFucygxMTkzMTU3MTc1MTQwNDcscmV2KGlucHV0KSkNCg0KIyMjIDEgdHJhbnNmb3JtDQoNCmBgYA0KDQoNCg0KYGBge3J9DQpiPC1zYXBwbHkoYSxmdW5jdGlvbih4KXsNCiAgZWJzKDU0NDg0MDc2MDY4ODY0LDU4NjgwNzk1OTg3OTY4LHgsMTE5MzE1NzE3NTE0MDQ3LDIwMTkpDQp9KQ0KYg0KDQpsbGw8LXNhcHBseSgxOjIwLGZ1bmN0aW9uKHgpew0KICBlYnMoNDMwMTgyNTgyMTkwMDgsMzMxNDM3MjU3NjEzMjIsYVt4XSwxMTkzMTU3MTc1MTQwNDcsYlt4XSkNCn0pDQpsbGwNCmBgYA0KDQoNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAyMiBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShiaXQ2NCkNCmxpYnJhcnkobnVtYmVycykNCmxpYnJhcnkocmVzaGFwZTIpDQpsaWJyYXJ5KGtuaXRyKQ0KbGlicmFyeShkcGx5cikNCmxpYnJhcnkoc3RyaW5ncikNCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShyZWFkcikNCmxpYnJhcnkoY29sbGVjdGlvbnMpDQpvcHRpb25zKHNjaXBlbiA9IDk5OSkNCmBgYA0KDQoNCiMjIFBhcnQgMQ0KDQpgYGB7cn0NCmlucHV0PC1yZWFkX2xpbmVzKCIuLi8uLi9Bb0NEYXRhL0FPQzIwMTkvRGF5MjIudHh0IikNCmBgYA0KDQpGb3IgcGFydCAxLCBJJ20gbWFuaXB1bGF0aW5nIHRoZSBkZWNrDQoNClRoaXMgcmV2ZXJzZXMgdGhlIGRlY2s6DQpgYGB7cn0NCm5ld3N0YWNrPC1mdW5jdGlvbihkKXsNCiAgcmV2KGQpfQ0KYGBgDQoNClRoaXMgY3V0cyBpdCAoYm90aCBwb3MgJiBuZWcgd29yaykNCmBgYHtyfQ0KY3V0ZGVjazwtZnVuY3Rpb24oZCxuKXsNCiAgbjwtbiUlbGVuZ3RoKGQpDQogIG91dGRlY2s8LWQNCiAgb3V0ZGVjazwtYyhkWy1jKDE6bildLGRbYygxOm4pXSkNCiAgb3V0ZGVja30NCmBgYA0KDQpUaGlzIGRvZXMgdGhlICJkZWFsIHdpdGggaW5jcmVtZW50IiBzaHVmZmxlDQoNCmBgYHtyfQ0KZHdpPC1mdW5jdGlvbihkLG4pew0KICBvdXRkZWNrPC1jKCkNCiAgZm9yKGkgaW4gMTpsZW5ndGgoZCkpew0KICAgIHg8LSgoaS0xKSpuKzEpJSVsZW5ndGgoZCkNCiAgICBpZih4PT0wKXt4PC1sZW5ndGgoZCl9DQogICAgb3V0ZGVja1t4XTwtZFtpXX0NCiAgb3V0ZGVja30NCmBgYA0KDQpUaGlzIGZ1bmN0aW9uIHJlYWRzIGluIHRoZSBpbnN0cnVjdGlvbnMsIGRvZXMgdGhlbSBhbGwgYW5kIHJldHVybnMgYSBzaHVmZmxlZCwgbWFuaXB1bGF0ZWQgZGVjaw0KDQpgYGB7cn0NCnNodWZmbGVwYXJ0MTwtZnVuY3Rpb24oZCxpbnN0cnVjdGlvbnMpew0KICBpPC0xDQogIHdoaWxlKGk8PWxlbmd0aChpbnN0cnVjdGlvbnMpKXsNCiAgICBpbnN0PC11bmxpc3Qoc3RyX3NwbGl0KGluc3RydWN0aW9uc1tpXSwiICIpKQ0KICAgICMjIyBpZiB0aGUgZmlyc3Qgd29yZCBpcyBjdXQsIGN1dA0KICAgIGlmKGluc3RbMV09PSJjdXQiKXsNCiAgICAgIGQ8LWN1dGRlY2soZCxhcy5udW1lcmljKGluc3RbMl0pKQ0KICAgICMjIyBvdGhlcndpc2UgaWYgdGhlIHNlY29uZCB3b3JkIGlzICJpbnRvIiByZXZlcnNlIHRoZSBkZWNrDQogICAgfWVsc2UgaWYoaW5zdFsyXT09ImludG8iKXsNCiAgICAgIGQ8LW5ld3N0YWNrKGQpDQogICAgIyMjIG90aGVyd2lzZSBpZiB0aGUgc2Vjb25kIHdvcmQgaXMgIndpdGgiIHRoZW4gZGVhbCB3aXRoIGluY3JlbWVudA0KICAgIH1lbHNlIGlmKGluc3RbMl09PSJ3aXRoIil7DQogICAgICBkPC1kd2koZCxhcy5udW1lcmljKGluc3RbNF0pKQ0KICAgIH1lbHNle2NhdCgiU29tZXRpbmcgd2VudCB3cm9uZ1xuIil9DQogICAgaTwtaSsxfQ0KICBkfQ0KYGBgDQoNClBhcnQgMSAtIHJ1biB0aGlzIGFnYWluc3QgbXkgaW5wdXQgJiBnZXQgdGhlIGFuc3dlcg0KDQpgYGB7cn0NCnAxPC1zaHVmZmxlcGFydDEoMDoxMDAwNixpbnB1dCkNCnBhcnQxPC13aGljaChwMT09MjAxOSktMQ0KcGFydDENCg0KYGBgDQoNCg0KDQoNCmBgYHtyfQ0KcDE8LTA6MTAwMDYNCng8LTIwMTkNCmZvcihpIGluIDE6MTApew0KICBwMTwtc2h1ZmZsZXBhcnQxKHAxLGlucHV0KQ0KICB4PC13aGljaChwMT09MjAxOSktMQ0KICBjYXQoeCwiXG4iKQ0KfQ0KYGBgDQoNCg0KDQojIyBQYXJ0IDIgLSANCg0KTXkgYXR0ZW1wdCB0byB1c2UgbW9kdWxhciBhcml0aG1ldGljOg0KDQoNClRoaXMgdGFrZXMgdGhlIGRlY2tzaXplICYgdGhlIGluc3RydWN0aW9ucyBhbmQgcmV0dXJucyB3aXRoIHRoZSBjb2VmZmljaWVudHMgb2YgdGhlIGVxdWF0aW9uIHRoYXQgd291bGQgc29sdmUgaXQgaW4gb25lIGdvOiANCmBgYHtyfQ0KbW9kdHJhbnNmb3JtPC1mdW5jdGlvbihkZWNrc2l6ZSxpbnN0cnVjdGlvbnMpew0KICBhPC0xDQogIGI8LTANCiAgbTwtZGVja3NpemUNCiAgaTwtMQ0KICB3aGlsZShpPD1sZW5ndGgoaW5zdHJ1Y3Rpb25zKSl7DQogICAgaW5zdDwtdW5saXN0KHN0cl9zcGxpdChpbnN0cnVjdGlvbnNbaV0sIiAiKSkNCiAgICANCiAgICAjIyMgY3V0DQogICAgaWYoaW5zdFsxXT09ImN1dCIpew0KICAgICAgYzwtMQ0KICAgICAgZDwtIC1hcy5udW1lcmljKGluc3RbMl0pDQogICAgIyMjIHJldmVyc2UNCiAgICB9ZWxzZSBpZihpbnN0WzJdPT0iaW50byIpew0KICAgICAgYzwtIC0xDQogICAgICBkPC0gLTENCiAgICAjIyMgZGVhbCB3aXRoIGluY3JlbWVudA0KICAgIH1lbHNlIGlmKGluc3RbMl09PSJ3aXRoIil7DQogICAgICBjPC0gYXMubnVtZXJpYyhpbnN0WzRdKQ0KICAgICAgZDwtIDANCiAgICB9ZWxzZXtjYXQoIlNvbWV0aW5nIHdlbnQgd3JvbmdcbiIpfQ0KICAgIGE8LShhKmMpJSVtDQogICAgYjwtKGIqYytkKSUlbQ0KICAgIGk8LWkrMX0NCiAgYyhhLGIpfQ0KDQpgYGANCg0KDQpGb3IgYSBkZWNrIHNpemUgb2YgMTAwMDcsIHRoaXMgaXMgdGhlIGFuc3dlcjoNCmBgYHtyfQ0KbW9kdHJhbnNmb3JtKDEwMDA3LGlucHV0KQ0KIyMjDQpgYGANClRoZSBBIGlzIDkzOTAuICBUaGUgQiBpcyA3NDU5Lg0KDQpGb3IgYSBzYW5pdHkgY2hlY2sgLSB0aGlzIGlzIHdoYXQgdGhlIG9sZCBtZXRob2QgZ2l2ZXMgZm9yIHRoZSBwb3NpdGlvbiBvZiBjYXJkIDIwMTkgdGhlIGZpcnN0IDEwIHNodWZmbGVzIG9mIGEgMTAwMDcgY2FyZCBkZWNrDQoNCmBgYHtyfQ0KcDE8LTA6MTAwMDYNCng8LTIwMTkNCm9sZG1ldGhvZDwtYygpDQpmb3IoaSBpbiAxOjEwKXsNCiAgcDE8LXNodWZmbGVwYXJ0MShwMSxpbnB1dCkNCiAgeDwtd2hpY2gocDE9PTIwMTkpLTENCiAgb2xkbWV0aG9kPC1jKG9sZG1ldGhvZCx4KQ0KfQ0Kb2xkbWV0aG9kDQpgYGANCg0KDQpBbmQgdGhpcyBpcyB3aGF0IHRoZSBuZXcgbWV0aG9kIGdpdmVzDQpgYGB7cn0NCmNyZDwtMjAxOQ0KbmV3bWV0aG9kPC1jKCkNCmZvcihpIGluIDE6MTApew0KY3JkPC0oOTM5MCpjcmQrNzQ1OSklJTEwMDA3DQpuZXdtZXRob2Q8LWMobmV3bWV0aG9kLGNyZCl9DQpuZXdtZXRob2QNCg0KY2F0KCJjb21wYXJlIG9sZCBtZXRob2QgYW5kIG5ldyBtZXRob2Q6ICIsIG9sZG1ldGhvZD09bmV3bWV0aG9kLCJcbiIpDQoNCg0KYGBgDQpUaGV5IGFyZSB0aGUgc2FtZSAtIHNvIEkgdGhpbmsgdGhhdCB0aGUgbW9kdWxhciBpcyB3b3JraW5nLg0KDQoNClRoaXMgaXMganVzdCB0aGUgZnVuY3Rpb24gZm9yIGNvbXBvc2luZyBBeCtCIG9udG8gQ3grRCBtb2QgTQ0KYGBge3J9DQpjbXBzPC1mdW5jdGlvbihhLGIsYyxkLG0pew0KICBhPC0oYSpjKSUlbQ0KICBiPC0oKGIqYykrZCklJW0NCiAgYyhhLGIpfQ0KYGBgDQoNCg0KVGhpcyB0YWtlcyB0aGUgZnVuY3Rpb24gQXgrQiBhbmQgcmFpc2VzIGl0IHRvIHRoZSBrIChzaHVmZmxlcyBtdWx0aXBsZSB0aW1lcykNCmBgYHtyfQ0KbXVsdGlzaHVmZmxlPC1mdW5jdGlvbihhLGIsayxkZWNrc2l6ZSx0KXsNCiAgYzwtMQ0KICBkPC0wDQogIHdoaWxlKGs+MCl7DQogICAgaWYoayUlMj09MSl7DQogICAgICBnPC1jbXBzKGEsYixjLGQsZGVja3NpemUpDQogICAgICBjPC1nWzFdDQogICAgICBkPC1nWzJdfQ0KICAgIGs8LWslLyUyDQogIGY8LWNtcHMoYSxiLGEsYixkZWNrc2l6ZSkNCiAgYTwtZlsxXQ0KICBiPC1mWzJdfQ0KICAoYyp0K2QpJSVkZWNrc2l6ZX0NCg0KYGBgDQoNCg0KQW5kIGFnYWluLCB1c2luZyAxMDAwNyBhbmQgY2FyZCAyMDE5IC0gdGhpcyBpcyB3aGVyZSBpdCBnb2VzIGZvciB0aGUgZmlyc3QgMTAgc2h1ZmZsZXMNCmBgYHtyfQ0KDQptdWx0aXNodWZmbGV2ZXJzaW9uPC1jKCkNCmZvcihpIGluIDE6MTApe211bHRpc2h1ZmZsZXZlcnNpb248LWMobXVsdGlzaHVmZmxldmVyc2lvbixtdWx0aXNodWZmbGUoOTM5MCw3NDU5LGksMTAwMDcsMjAxOSkpfQ0KDQptdWx0aXNodWZmbGV2ZXJzaW9uDQoNCmNhdCgiY29tcGFyZSBuZXcgbWV0aG9kICYgbXVsdGlzaHVmZmxlOiAiLCBtdWx0aXNodWZmbGV2ZXJzaW9uPT1uZXdtZXRob2QsIlxuIikNCg0KYGBgDQpTbyB0aGlzIGdpdmVzIHRoZSBzYW1lIGFuc3dlcg0KDQpCVVQhISEhISEhISEhDQoNClRoZSBxdWVzdGlvbiBhc2tzIGZvciB0aGUgY2FyZCBpbiBwb3NpdGlvbiAyMDIwLCBub3Qgd2hlcmUgMjAyMCBlbmRzIHVwLiAgU28sIGl0IG5lZWRzIHRoZSBpbnZlcnNlIGZ1bmN0aW9uDQoNCkFuZCB0byBmaW5kIHRoYXQsIHlvdSBmaW5kIHRoZSBpbnZlcnNlIG9mIEEgZm9yIHRoYXQgZGVjayBzaXplDQoNCmBgYHtyfQ0KIyMjIEENCm1vZGludig5MzkwLDEwMDA3KQ0KIyMjIEINCihtb2RpbnYoOTM5MCwxMDAwNykqLTc0NTkpJSUxMDAwNw0KYGBgDQpTbywgdG8gZmluZCB3aGF0IGNhcmQgd2FzIGluIHRoYXQgcG9zaXRpb24sIHlvdSBjYW4gdXNlIDUxOSAmIDg1MTkgKHdpdGggdGhlc2UgaW5zdHJ1Y3Rpb25zIG9uIGEgZGVjayBvZiAxMDAwNykNClRvIHNob3cgdGhhdCBtYWtlcyBzZW5zZSwgdHJ5IGl0IG9uIHRoZSBmaXJzdCAxMCBzaHVmZmxlIHBvc2l0aW9ucyAtIGFsbCBvZiB0aGVtIHNob3VsZCByZXR1cm4gMjAxOToNCg0KYGBge3J9DQpzYXBwbHkoMToxMCxmdW5jdGlvbih4KXttdWx0aXNodWZmbGUoNTE5LDE0ODgseCwxMDAwNyxtdWx0aXNodWZmbGV2ZXJzaW9uW3hdKX0pDQpgYGANCkV4YWN0bHkgYXMgZXhwZWN0ZWQuDQoNCi0tLS0NCg0KU28gdHJ5aW5nIHRoaXMgd2l0aCBhIHJlYWxseSwgcmVhbGx5LCByZWFsbHkgYmlnIGRlY2sgYW5kIGEgbG90IG9mIHNodWZmbGVzOg0KDQoNCg0KYGBge3J9DQptb2R0cmFuc2Zvcm0oMTE5MzE1NzE3NTE0MDQ3LGlucHV0KQ0KYGBgDQpBPTI4NDgwNDQ0OTc0NzYzDQpCPTEwNDM0MzAyOTA4MjU1Mw0KDQoNCkludmVydCB0aGUgQSAmIEI6DQpgYGB7cn0NCiMjIyBBDQptb2RpbnYoMjg0ODA0NDQ5NzQ3NjMsMTE5MzE1NzE3NTE0MDQ3KQ0KIyMjIEINCihtb2RpbnYoMjg0ODA0NDQ5NzQ3NjMsMTE5MzE1NzE3NTE0MDQ3KSotMTA0MzQzMDI5MDgyNTUzKSUlMTE5MzE1NzE3NTE0MDQ3DQoNCmBgYA0KQW5kIHJ1biB0aGF0IHRocm91Z2ggbXVsdGlzaHVmZmxlOg0KDQpgYGB7cn0NCm11bHRpc2h1ZmZsZSg4MjY3NTk0ODcxOTkzMSw3OTE4ODQ1OTUyMDAsMTAxNzQxNTgyMDc2NjYxLDExOTMxNTcxNzUxNDA0NywyMDIwKQ0KYGBgDQpBTkQgVEhBVCdTIFRIRSBXUk9ORyBBTlNXRVINCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCg0KU28sIHRyeWluZyB0aGlzIGJhY2t3YXJkczoNCg0KVGhpcyBmdW5jdGlvbiBkb2VzIHRoZSByZXZlcnNlIG9mIGV2ZXJ5dGhpbmcuICBJdCBjdXRzIGJhY2t3YXJkcywgaXQgcmV2ZXJzZXMgKHdoaWNoIGlzIHRoZSBzYW1lIGVpdGhlciB3YXkpLCBpdCBkZWFscyBpbnRvIGJhY2t3YXJkcy4NCmBgYHtyfQ0KaW52ZXJzdHJhbnM8LWZ1bmN0aW9uKGRlY2tzaXplLGluc3RydWN0aW9ucyl7DQogIGE8LTENCiAgYjwtMA0KICBtPC1kZWNrc2l6ZQ0KICBpPC0xDQogIHdoaWxlKGk8PWxlbmd0aChpbnN0cnVjdGlvbnMpKXsNCiAgICBpbnN0PC11bmxpc3Qoc3RyX3NwbGl0KGluc3RydWN0aW9uc1tpXSwiICIpKQ0KICAgIGlmKGluc3RbMV09PSJjdXQiKXsNCiAgICAgIGM8LTENCiAgICAgIGQ8LSAtYXMubnVtZXJpYyhpbnN0WzJdKQ0KICAgIH1lbHNlIGlmKGluc3RbMl09PSJpbnRvIil7DQogICAgICBjPC0gLTENCiAgICAgIGQ8LSAtMQ0KICAgIH1lbHNlIGlmKGluc3RbMl09PSJ3aXRoIil7DQogICAgICBjPC0gYXMubnVtZXJpYyhpbnN0WzRdKQ0KICAgICAgZDwtIDANCiAgICB9ZWxzZXtjYXQoIlNvbWV0aW5nIHdlbnQgd3JvbmdcbiIpfQ0KICAgICMjIyBpbnZlcnQgaXQNCiAgICBpbnZjPC1tb2RpbnYoYyxtKSUlbQ0KICAgIGludmQ8LSAoLWQqbW9kaW52KGMsbSkpJSVtDQogICAgIyMjDQogICAgYTwtKGEqaW52YyklJW0NCiAgICBiPC0oYippbnZjK2ludmQpJSVtDQogICAgaTwtaSsxfQ0KICAjIyMgcmVhbGlnbnMgdG8gYmUgMCBpbmRleGVkDQogIGMoYSxiKX0NCmBgYA0KDQpBZ2FpbiBzaG93aW5nIHRoYXQgaXQgd29ya3Mgd2l0aCAxMDAwNw0KDQpgYGB7cn0NCmludmVyc3RyYW5zKDEwMDA3LHJldihpbnB1dCkpDQpgYGANCkFuZCB0aG9zZSBudW1iZXJzIG1heSBsb29rIGZhbWlsaWFyIC0gYmVjYXVzZSB0aGV5J3JlIHRoZSBzYW1lIGFzIGFib3ZlLiAgQW5kIHNvIGl0J3MgY2xlYXIgdGhhdCB0aGlzIHNob3VsZCB3b3JrDQoNCg0KDQpPbiB0aGUgcmVhbGx5IGJpZyBkZWNrOg0KYGBge3J9DQppbnZlcnN0cmFucygxMTkzMTU3MTc1MTQwNDcscmV2KGlucHV0KSkNCmBgYA0KVGhvc2UgYXJlIGRpZmZlcmVudCBudW1iZXJzIHRoYW4gYWJvdmUsIGJ1dCBtYXliZSB0aGV5J2xsIHdvcmsuDQoNCnJ1biB0aHJvdWdoIG11bHRpc2h1ZmZsZTogDQoNCmBgYHtyfQ0KbXVsdGlzaHVmZmxlKDQzMDE4MjU4MjE5MDA4LDMzMTQzNzI1NzYxMzIyLDEwMTc0MTU4MjA3NjY2MSwxMTkzMTU3MTc1MTQwNDcsMjAyMCkNCmBgYA0Kd2hpY2ggaXMgc3RpbGwgdGhlIHdyb25nIGFuc3dlci4NCg0KDQo=</div>
 
 
 
