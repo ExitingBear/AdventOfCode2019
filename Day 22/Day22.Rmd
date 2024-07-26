@@ -4,7 +4,7 @@ output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
-library(bit64)
+library(gmp)
 library(numbers)
 library(reshape2)
 library(knitr)
@@ -230,16 +230,30 @@ To show that makes sense, try it on the first 10 shuffle positions - all of them
 ```{r}
 sapply(1:10,function(x){multishuffle(519,1488,x,10007,multishuffleversion[x])})
 ```
+```{r}
+multishuffle(519,1488,10,10007,2020)
+```
+
+
 Exactly as expected.
 
 ----
 
 So trying this with a really, really, really big deck and a lot of shuffles:
 
+```{r}
+largedeck<-as.bigz("119315717514047")
+largeshuffle<-as.bigz("101741582076661")
+```
 
 
 ```{r}
-modtransform(119315717514047,input)
+AB<-modtransform(largedeck,input)
+A<-as.bigz(AB[1])
+B<-as.bigz(AB[2])
+A
+B
+
 ```
 A=28480444974763
 B=104343029082553
@@ -248,22 +262,40 @@ B=104343029082553
 Invert the A & B:
 ```{r}
 ### A
-modinv(28480444974763,119315717514047)
+#iA<-modinv(A,largedeck)
 ### B
-(modinv(28480444974763,119315717514047)*-104343029082553)%%119315717514047
+#iB<-(modinv(A,largedeck)*-B)%%largeDeck
 
 ```
+Using wolfram alpha - iA = 82675948719931
+iB = 403183578768
+
+
+```{r}
+iA<-as.bigz("82675948719931")
+iB<-as.bigz("403183578768")
+```
+
+
 And run that through multishuffle:
 
 ```{r}
-multishuffle(82675948719931,791884595200,101741582076661,119315717514047,2020)
+multishuffle(iA,iB,largeshuffle,largedeck,2020)
 ```
-AND THAT'S THE WRONG ANSWER
+
+
+
+
 ----------------------------
 
 So, trying this backwards:
 
 This function does the reverse of everything.  It cuts backwards, it reverses (which is the same either way), it deals into backwards.
+
+
+
+
+
 ```{r}
 inverstrans<-function(decksize,instructions){
   a<-1
@@ -301,18 +333,4 @@ inverstrans(10007,rev(input))
 And those numbers may look familiar - because they're the same as above.  And so it's clear that this should work
 
 
-
-On the really big deck:
-```{r}
-inverstrans(119315717514047,rev(input))
-```
-Those are different numbers than above, but maybe they'll work.
-
-run through multishuffle: 
-
-```{r}
-multishuffle(43018258219008,33143725761322,101741582076661,119315717514047,2020)
-```
-which is still the wrong answer.
-
-
+This doesn't work on the really big deck - because I can't run bigz through modinv
