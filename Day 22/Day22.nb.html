@@ -2094,60 +2094,114 @@ A</code></pre>
 <p>Invert the A &amp; B:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIEFcbiNpQTwtbW9kaW52KEEsbGFyZ2VkZWNrKVxuIyMjIEJcbiNpQjwtKG1vZGludihBLGxhcmdlZGVjaykqLUIpJSVsYXJnZURlY2tcblxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIEFcbiNpQTwtbW9kaW52KEEsbGFyZ2VkZWNrKVxuIyMjIEJcbiNpQjwtKG1vZGludihBLGxhcmdlZGVjaykqLUIpJSVsYXJnZURlY2tcblxubW9kaW52KDI4NDgwNDQ0OTc0NzYzLDExOTMxNTcxNzUxNDA0NylcbmBgYCJ9 -->
 <pre class="r"><code>### A
 #iA&lt;-modinv(A,largedeck)
 ### B
 #iB&lt;-(modinv(A,largedeck)*-B)%%largeDeck
-</code></pre>
+
+modinv(28480444974763,119315717514047)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDgyNjc1OTQ4NzE5OTMxXG4ifQ== -->
+<pre><code>[1] 82675948719931</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuKDI4NDgwNDQ0OTc0NzYzKigtMTA0MzQzMDI5MDgyNTUzKSlcbmBgYCJ9 -->
+<pre class="r"><code>(28480444974763*(-104343029082553))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIC0yOTcxNzM1ODk4Mjg1NzQ1OTMxNjIwODIwNjgyXG4ifQ== -->
+<pre><code>[1] -2971735898285745931620820682</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Using wolfram alpha - iA = 82675948719931 iB = 403183578768</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaUE8LWFzLmJpZ3ooXCI4MjY3NTk0ODcxOTkzMVwiKVxuaUI8LWFzLmJpZ3ooXCI0MDMxODM1Nzg3NjhcIilcbmBgYCJ9 -->
-<pre class="r"><code>iA&lt;-as.bigz(&quot;82675948719931&quot;)
-iB&lt;-as.bigz(&quot;403183578768&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>And run that through multishuffle:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubXVsdGlzaHVmZmxlKGlBLGlCLGxhcmdlc2h1ZmZsZSxsYXJnZWRlY2ssMjAyMClcbmBgYCJ9 -->
-<pre class="r"><code>multishuffle(iA,iB,largeshuffle,largedeck,2020)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiQmlnIEludGVnZXIgKCdiaWd6JykgOlxuWzFdIDc5NjA4NDEwMjU4NDYyXG4ifQ== -->
-<pre><code>Big Integer (&#39;bigz&#39;) :
-[1] 79608410258462</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<hr />
-<p>So, trying this backwards:</p>
-<p>This function does the reverse of everything. It cuts backwards, it
-reverses (which is the same either way), it deals into backwards.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW52ZXJzdHJhbnM8LWZ1bmN0aW9uKGRlY2tzaXplLGluc3RydWN0aW9ucyl7XG4gIGE8LTFcbiAgYjwtMFxuICBtPC1kZWNrc2l6ZVxuICBpPC0xXG4gIHdoaWxlKGk8PWxlbmd0aChpbnN0cnVjdGlvbnMpKXtcbiAgICBpbnN0PC11bmxpc3Qoc3RyX3NwbGl0KGluc3RydWN0aW9uc1tpXSxcIiBcIikpXG4gICAgaWYoaW5zdFsxXT09XCJjdXRcIil7XG4gICAgICBjPC0xXG4gICAgICBkPC0gLWFzLm51bWVyaWMoaW5zdFsyXSlcbiAgICB9ZWxzZSBpZihpbnN0WzJdPT1cImludG9cIil7XG4gICAgICBjPC0gLTFcbiAgICAgIGQ8LSAtMVxuICAgIH1lbHNlIGlmKGluc3RbMl09PVwid2l0aFwiKXtcbiAgICAgIGM8LSBhcy5udW1lcmljKGluc3RbNF0pXG4gICAgICBkPC0gMFxuICAgIH1lbHNle2NhdChcIlNvbWV0aW5nIHdlbnQgd3JvbmdcXG5cIil9XG4gICAgIyMjIGludmVydCBpdFxuICAgIGludmM8LW1vZGludihjLG0pJSVtXG4gICAgaW52ZDwtICgtZCptb2RpbnYoYyxtKSklJW1cbiAgICAjIyNcbiAgICBhPC0oYSppbnZjKSUlbVxuICAgIGI8LShiKmludmMraW52ZCklJW1cbiAgICBpPC1pKzF9XG4gICMjIyByZWFsaWducyB0byBiZSAwIGluZGV4ZWRcbiAgYyhhLGIpfVxuYGBgIn0= -->
-<pre class="r"><code>inverstrans&lt;-function(decksize,instructions){
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaUE8LWFzLmJpZ3ooXFw4MjY3NTk0ODcxOTkzMVxcKVxuaUI8LWFzLmJpZ3ooXFw0MDMxODM1Nzg3NjhcXClcbmBgYFxuYGBgIn0= -->
+<pre class="r"><code>```r
+iA&lt;-as.bigz(\82675948719931\)
+iB&lt;-as.bigz(\403183578768\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+
+And run that through multishuffle:
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubXVsdGlzaHVmZmxlKGlBLGlCLGxhcmdlc2h1ZmZsZSxsYXJnZWRlY2ssMjAyMClcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+multishuffle(iA,iB,largeshuffle,largedeck,2020)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-output-begin eyJkYXRhIjoiQmlnIEludGVnZXIgKCdiaWd6JykgOlxuWzFdIDc5NjA4NDEwMjU4NDYyXG4ifQ== --&gt;
+</code></pre>
+<p>Big Integer (‘bigz’) : [1] 79608410258462</p>
+<pre><code>
+
+
+&lt;!-- rnb-output-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+
+
+
+----------------------------
+
+So, trying this backwards:
+
+This function does the reverse of everything.  It cuts backwards, it reverses (which is the same either way), it deals into backwards.
+
+
+
+
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaW52ZXJzdHJhbnM8LWZ1bmN0aW9uKGRlY2tzaXplLGluc3RydWN0aW9ucyl7XG4gIGE8LTFcbiAgYjwtMFxuICBtPC1kZWNrc2l6ZVxuICBpPC0xXG4gIHdoaWxlKGk8PWxlbmd0aChpbnN0cnVjdGlvbnMpKXtcbiAgICBpbnN0PC11bmxpc3Qoc3RyX3NwbGl0KGluc3RydWN0aW9uc1tpXSxcXCBcXCkpXG4gICAgaWYoaW5zdFsxXT09XFxjdXRcXCl7XG4gICAgICBjPC0xXG4gICAgICBkPC0gLWFzLm51bWVyaWMoaW5zdFsyXSlcbiAgICB9ZWxzZSBpZihpbnN0WzJdPT1cXGludG9cXCl7XG4gICAgICBjPC0gLTFcbiAgICAgIGQ8LSAtMVxuICAgIH1lbHNlIGlmKGluc3RbMl09PVxcd2l0aFxcKXtcbiAgICAgIGM8LSBhcy5udW1lcmljKGluc3RbNF0pXG4gICAgICBkPC0gMFxuICAgIH1lbHNle2NhdChcXFNvbWV0aW5nIHdlbnQgd3JvbmdcXG5cXCl9XG4gICAgIyMjIGludmVydCBpdFxuICAgIGludmM8LW1vZGludihjLG0pJSVtXG4gICAgaW52ZDwtICgtZCptb2RpbnYoYyxtKSklJW1cbiAgICAjIyNcbiAgICBhPC0oYSppbnZjKSUlbVxuICAgIGI8LShiKmludmMraW52ZCklJW1cbiAgICBpPC1pKzF9XG4gICMjIyByZWFsaWducyB0byBiZSAwIGluZGV4ZWRcbiAgYyhhLGIpfVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+inverstrans&lt;-function(decksize,instructions){
   a&lt;-1
   b&lt;-0
   m&lt;-decksize
   i&lt;-1
   while(i&lt;=length(instructions)){
-    inst&lt;-unlist(str_split(instructions[i],&quot; &quot;))
-    if(inst[1]==&quot;cut&quot;){
+    inst&lt;-unlist(str_split(instructions[i],\ \))
+    if(inst[1]==\cut\){
       c&lt;-1
       d&lt;- -as.numeric(inst[2])
-    }else if(inst[2]==&quot;into&quot;){
+    }else if(inst[2]==\into\){
       c&lt;- -1
       d&lt;- -1
-    }else if(inst[2]==&quot;with&quot;){
+    }else if(inst[2]==\with\){
       c&lt;- as.numeric(inst[4])
       d&lt;- 0
-    }else{cat(&quot;Someting went wrong\n&quot;)}
+    }else{cat(\Someting went wrong\n\)}
     ### invert it
     invc&lt;-modinv(c,m)%%m
     invd&lt;- (-d*modinv(c,m))%%m
@@ -2157,17 +2211,35 @@ reverses (which is the same either way), it deals into backwards.</p>
     i&lt;-i+1}
   ### realigns to be 0 indexed
   c(a,b)}</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Again showing that it works with 10007</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW52ZXJzdHJhbnMoMTAwMDcscmV2KGlucHV0KSlcbmBgYCJ9 -->
-<pre class="r"><code>inverstrans(10007,rev(input))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdICA1MTkgMTQ4OFxuIn0= -->
-<pre><code>[1]  519 1488</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+Again showing that it works with 10007
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaW52ZXJzdHJhbnMoMTAwMDcscmV2KGlucHV0KSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+inverstrans(10007,rev(input))</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdICA1MTkgMTQ4OFxuIn0= --&gt;
+</code></pre>
+<p>[1] 519 1488 ```</p>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
